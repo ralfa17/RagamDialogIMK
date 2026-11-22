@@ -1007,10 +1007,28 @@ PLAY "Arabella"</textarea>
        JAVASCRIPT LOGIC REAL AUDIO, SVG COVERS, & 9 IMK DIALOGUES
        ==================================================================== -->
   <script>
-    // State Global
-    let SONGS = [];
-    let QUEUE = [];
-    let CURRENT_SONG = null;
+    // State Global & Default Master Tracks (Arctic Monkeys 10 Essential Collection)
+    const DEFAULT_TRACKS = [
+      { id: 1, title: "Do I Wanna Know?", artist: "Arctic Monkeys", album: "AM", year: 2013, duration: 272, tempo: 85, mood: "chill", energy: 65, danceability: 55, valence: 42, acousticness: 18, theme: "am_wave", accent: "#E56B45", local_filename: "do_i_wanna_know.mp3", default_preview: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/71/cb/ba/71cbbaa1-016b-0e73-dfc2-9f4ede9ddfc0/mzaf_16266777024198047150.plus.aac.p.m4a", audio_url: "/static/audio/do_i_wanna_know.mp3", lyrics: "Have you got colour in your cheeks?\nDo you ever get that fear that you can't shift the type\nThat sticks around like summat in your teeth?\nAre there some aces up your sleeve?\nHave you no idea that you're in deep?\nI've dreamt about you nearly every night this week\nHow many secrets can you keep?\n'Cause there's this tune I found that makes me think of you somehow and I play it on repeat\nUntil I fall asleep, spilling drinks on my settee..." },
+      { id: 2, title: "R U Mine?", artist: "Arctic Monkeys", album: "AM", year: 2013, duration: 201, tempo: 97, mood: "energetic", energy: 94, danceability: 62, valence: 58, acousticness: 6, theme: "am_wave", accent: "#E56B45", local_filename: "r_u_mine.mp3", default_preview: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6f/80/9f/6f809f2b-b960-90c1-f618-4e1d1fec11fa/mzaf_3957424487272184184.plus.aac.p.m4a", audio_url: "/static/audio/r_u_mine.mp3", lyrics: "I'm a puppet on a string\nTracy Island, time-traveling diamond cutter-shaped heartaches\nCome to find you four in some velvet morning years too late\nShe's a silver lining, lone ranger riding through an open space\nIn my mind, when she's not right there beside me\nI go crazy 'cause here isn't where I wanna be\nAnd satisfaction feels like a distant memory\nAnd I can't help myself, all I wanna hear her say is, 'Are you mine?'..." },
+      { id: 3, title: "Arabella", artist: "Arctic Monkeys", album: "AM", year: 2013, duration: 207, tempo: 90, mood: "energetic", energy: 88, danceability: 59, valence: 64, acousticness: 12, theme: "am_wave", accent: "#E56B45", local_filename: "arabella.mp3", default_preview: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/44/22/a3/4422a3ae-590f-0447-6950-c6e8dd1845bc/mzaf_16480584400790740900.plus.aac.p.m4a", audio_url: "/static/audio/arabella.mp3", lyrics: "Arabella's got some interstellar-gator skin boots\nAnd a helical hairpin with a collection of antique loops\nHer lips are like the galaxy's edge\nAnd her kiss the colour of a constellation falling into place\nShe looks like the next best thing to you\nCan't explain the state that I'm in\nTakes a sip of my Mexican Coke..." },
+      { id: 4, title: "Knee Socks", artist: "Arctic Monkeys", album: "AM", year: 2013, duration: 257, tempo: 94, mood: "chill", energy: 72, danceability: 68, valence: 49, acousticness: 15, theme: "am_wave", accent: "#E56B45", local_filename: "knee_socks.mp3", default_preview: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b8/b6/2a/b8b62a6b-c744-b0e5-7977-0fc545a1f6a1/mzaf_10595304653606972688.plus.aac.p.m4a", audio_url: "/static/audio/knee_socks.mp3", lyrics: "You and me could've been a team\nEach had a half of a king and queen seat\nLike the beginnings of a bad dream\nThere had to come a point where you and I would cross\nWhen you walked in with those knee socks on\nWell you cured the January blues..." },
+      { id: 5, title: "Snap Out of It", artist: "Arctic Monkeys", album: "AM", year: 2013, duration: 192, tempo: 134, mood: "upbeat", energy: 86, danceability: 74, valence: 75, acousticness: 10, theme: "am_wave", accent: "#E56B45", local_filename: "snap_out_of_it.mp3", default_preview: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/37/ba/df/37badffc-b4db-452f-e8b2-540784ee0b3b/mzaf_9918731327125348877.plus.aac.p.m4a", audio_url: "/static/audio/snap_out_of_it.mp3", lyrics: "What's been going on in your head?\nDarling, I think you've had too much of that\nSnap out of it\nForever isn't for everyone\nIs forever for you?\nIt sounds like somebody took you for a ride..." },
+      { id: 6, title: "One for the Road", artist: "Arctic Monkeys", album: "AM", year: 2013, duration: 206, tempo: 104, mood: "chill", energy: 68, danceability: 61, valence: 45, acousticness: 22, theme: "am_wave", accent: "#E56B45", local_filename: "one_for_the_road.mp3", default_preview: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/21/2e/ba/212eba2d-8628-941f-cb70-766ae8cf1b34/mzaf_9954009386345914614.plus.aac.p.m4a", audio_url: "/static/audio/one_for_the_road.mp3", lyrics: "One for the road, one for the road\nThere's no need to show me round the place, I know where things go\nSo we go one for the road...\nFrom the bottom of your heart, the darkness there can grow..." },
+      { id: 7, title: "No. 1 Party Anthem", artist: "Arctic Monkeys", album: "AM", year: 2013, duration: 243, tempo: 73, mood: "ballad", energy: 44, danceability: 46, valence: 32, acousticness: 65, theme: "am_wave", accent: "#E56B45", local_filename: "no_1_party_anthem.mp3", default_preview: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/71/6a/06/716a066b-a818-f685-6490-67c87c71f307/mzaf_7823528761005876356.plus.aac.p.m4a", audio_url: "/static/audio/no_1_party_anthem.mp3", lyrics: "So you're on the prowl wondering whether\nShe left already or not\nLeather jacket, collar popped like antenna\nNever knowing when to stop\nLook around and you see the dancefloor clearing out\nThe number one party anthem..." },
+      { id: 8, title: "Mardy Bum", artist: "Arctic Monkeys", album: "Whatever People Say I Am, That's What I Am Not", year: 2006, duration: 175, tempo: 118, mood: "upbeat", energy: 79, danceability: 67, valence: 82, acousticness: 14, theme: "debut_classic", accent: "#F59E0B", local_filename: "mardy_bum.mp3", default_preview: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/91/92/ff/9192ffcf-fb57-1ee6-3dc9-fbf556396f9a/mzaf_14488924040213567954.plus.aac.p.m4a", audio_url: "/static/audio/mardy_bum.mp3", lyrics: "Now then Mardy Bum\nI've seen your frown and it's like looking down the barrel of a gun\nAnd it goes off\nAnd there's nothing you can do\nRemember cuddles in the kitchen, yeah, to get the things off the ground\nAnd it was up, up and away\nStill it's right hard for summat to be said..." },
+      { id: 9, title: "505", artist: "Arctic Monkeys", album: "Favourite Worst Nightmare", year: 2007, duration: 253, tempo: 140, mood: "emotional", energy: 85, danceability: 52, valence: 38, acousticness: 28, theme: "fwn_neon", accent: "#EC4899", local_filename: "505.mp3", default_preview: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/35/14/bf/3514bf26-eb52-a5e1-512c-da6a22f3e098/mzaf_11307659556816568266.plus.aac.p.m4a", audio_url: "/static/audio/505.mp3", lyrics: "I'm going back to 505\nIf it's a seven hour flight or a forty-five minute drive\nIn my imagination you're waiting lying on your side\nWith your hands between your thighs\nStop and wait a sec\nWhen you look at me like that, my darling, what did you expect?\nI'd probably still adore you with your hands around my neck\nOr I did last time I checked..." },
+      { id: 10, title: "Crying Lightning", artist: "Arctic Monkeys", album: "Humbug", year: 2009, duration: 224, tempo: 106, mood: "dark", energy: 82, danceability: 63, valence: 52, acousticness: 8, theme: "humbug_dark", accent: "#8B5CF6", local_filename: "crying_lightning.mp3", default_preview: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/87/80/79/8780790f-fc51-a13e-417d-ce1f449e5542/mzaf_5971917429981500357.plus.aac.p.m4a", audio_url: "/static/audio/crying_lightning.mp3", lyrics: "Outside the cafe by the cracker factory\nYou were practicing a magic trick\nAnd my thoughts got rude as you talked and chewed\nOn the last of your pick and mix\nSaid you're not supposed to do that, you'll break a bone\nAnd your past-time consisted of the strange\nAnd the twisted and you made me cry... Crying lightning..." }
+    ];
+
+    let LOCAL_USER_PLAYLISTS = [
+      { id: 1, name: "Midnight Indie Vibes", description: "Koleksi track atmosferik malam hari untuk fokus dan nugas.", genre: "Indie Rock", mood: "Chill", visibility: "Public", song_count: 10 },
+      { id: 2, name: "High Energy Workout", description: "Lagu dengan ketukan drum dan riff gitar membakar semangat.", genre: "Alternative Rock", mood: "Energetic", visibility: "Private", song_count: 6 }
+    ];
+
+    let SONGS = [...DEFAULT_TRACKS];
+    let QUEUE = SONGS.map(s => s.id);
+    let CURRENT_SONG = SONGS[0];
     let IS_PLAYING = false;
     let SHUFFLE = false;
     let REPEAT = false;
@@ -1107,18 +1125,31 @@ PLAY "Arabella"</textarea>
 
     // 1. Inisialisasi Aplikasi
     document.addEventListener('DOMContentLoaded', async () => {
-      await fetchSongs();
-      await fetchPlaylists();
+      // Inisialisasi visual UI seketika dengan 10 lagu master Arctic Monkeys
+      renderAlbumCards();
+      renderTracksTable();
+      renderAlbumsView();
+      renderQueueList();
+      renderBpmBarChart();
+      renderRadarChart(CURRENT_SONG);
+      updatePlayerUI(CURRENT_SONG);
+      renderPlaylistsList(LOCAL_USER_PLAYLISTS);
+
       initRealAudioEvents();
       initFloatingDrag();
       initKeyboardShortcuts();
       lucide.createIcons();
       drawWaveformLoop();
+
+      // Sinkronisasi data real-time dengan backend Flask melalui endpoint relatif
+      await fetchSongs();
+      await fetchPlaylists();
     });
 
     async function fetchSongs() {
       try {
         const res = await fetch('/api/songs');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
         const data = JSON.parse(text);
 
@@ -1136,7 +1167,7 @@ PLAY "Arabella"</textarea>
           updatePlayerUI(CURRENT_SONG);
         }
       } catch (e) {
-        console.error("Gagal mengambil data lagu:", e);
+        console.warn("Backend /api/songs offline, tetap menggunakan master tracks lokal:", e);
       }
     }
 
@@ -1591,6 +1622,8 @@ PLAY "Arabella"</textarea>
           body: JSON.stringify({cmd: cmd.trim()})
         });
 
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const text = await res.text();
         let data;
         try {
@@ -1607,7 +1640,12 @@ PLAY "Arabella"</textarea>
           data.actions.forEach(executeAction);
         }
       } catch (err) {
-        appendTerminalLine(screenId, `Jaringan Error: ${err.message}`, 'text-red-400');
+        console.warn("Backend /api/cli offline/gagal, menjalankan parser CLI lokal:", err);
+        const fb = executeLocalCliFallback(cmd.trim());
+        appendTerminalLine(screenId, fb.output, fb.isError ? 'text-red-400' : 'text-orange-300');
+        if (fb.actions && Array.isArray(fb.actions)) {
+          fb.actions.forEach(executeAction);
+        }
       }
     }
 
@@ -1670,6 +1708,8 @@ PLAY "Arabella"</textarea>
           body: JSON.stringify({script: script})
         });
 
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const text = await res.text();
         const data = JSON.parse(text);
 
@@ -1692,7 +1732,8 @@ PLAY "Arabella"</textarea>
           data.actions.forEach(executeAction);
         }
       } catch (e) {
-        logBox.innerHTML = `<span class="text-red-400">Error: ${e.message}</span>`;
+        console.warn("Backend /api/batch offline/gagal, menjalankan eksekutor batch lokal:", e);
+        executeLocalBatchFallback(script, logBox);
       }
     }
 
@@ -1722,6 +1763,8 @@ PLAY "Arabella"`;
           body: JSON.stringify({text: q})
         });
 
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const text = await res.text();
         const data = JSON.parse(text);
 
@@ -1734,7 +1777,15 @@ PLAY "Arabella"`;
           data.actions.forEach(executeAction);
         }
       } catch (e) {
-        console.error("NLP error:", e);
+        console.warn("Backend /api/nlp offline/gagal, menjalankan parser NLP lokal:", e);
+        const fb = executeLocalNlpFallback(q);
+        const bar = document.getElementById('nlpFeedbackBar');
+        const feedback = document.getElementById('nlpFeedbackText');
+        feedback.textContent = fb.output;
+        bar.classList.remove('hidden');
+        if (fb.actions && Array.isArray(fb.actions)) {
+          fb.actions.forEach(executeAction);
+        }
       }
     }
 
@@ -1790,6 +1841,132 @@ PLAY "Arabella"`;
           document.getElementById('btnRepeat').className = REPEAT ? 'text-[#E56B45]' : 'text-gray-400 hover:text-white';
           break;
       }
+    }
+
+    // ==========================================================================
+    // FALLBACK ENGINE CLIENT-SIDE UNTUK 9 RAGAM DIALOG (Zero Network Failure)
+    // ==========================================================================
+    function executeLocalCliFallback(commandStr) {
+      const trimmed = (commandStr || '').trim();
+      if (!trimmed || trimmed.startsWith('#')) return { output: 'Komentar/baris kosong dilewati.', actions: [] };
+      const parts = trimmed.split(/\s+/);
+      const verb = parts[0].toUpperCase();
+      const arg = trimmed.slice(parts[0].length).trim().replace(/^["']|["']$/g, '');
+
+      if (verb === 'PLAY') {
+        if (!arg) return { output: 'Melanjutkan pemutaran audio (Resume)', actions: [{type: 'resume'}] };
+        const found = SONGS.find(s => s.title.toLowerCase().includes(arg.toLowerCase()) || String(s.id) === arg);
+        if (found) return { output: `Memutar: "${found.title}" (${found.album})`, actions: [{type: 'play', id: found.id}] };
+        return { output: `ERROR: Lagu "${arg}" tidak ditemukan di daftar Arctic Monkeys.`, isError: true, actions: [] };
+      }
+      if (verb === 'PAUSE' || verb === 'STOP') return { output: 'Pemutaran audio dijeda (Paused)', actions: [{type: 'pause'}] };
+      if (verb === 'NEXT' || verb === 'SKIP') return { output: 'Beralih ke lagu berikutnya', actions: [{type: 'next'}] };
+      if (verb === 'PREV' || verb === 'BACK') return { output: 'Kembali ke lagu sebelumnya', actions: [{type: 'prev'}] };
+      if (verb === 'VOLUME' || verb === 'SET_VOLUME') {
+        const val = parseInt(arg, 10);
+        if (!isNaN(val) && val >= 0 && val <= 100) return { output: `Tingkat volume diatur ke ${val}%`, actions: [{type: 'volume', value: val}] };
+        return { output: 'ERROR: Nilai volume harus antara 0 dan 100', isError: true, actions: [] };
+      }
+      if (verb === 'QUEUE' || verb === 'ENQUEUE') {
+        if (!arg) return { output: 'ERROR: Sintaks QUEUE memerlukan judul lagu.', isError: true, actions: [] };
+        const found = SONGS.find(s => s.title.toLowerCase().includes(arg.toLowerCase()) || String(s.id) === arg);
+        if (found) return { output: `Ditambahkan ke antrean: "${found.title}"`, actions: [{type: 'queue', id: found.id}] };
+        return { output: `ERROR: Lagu "${arg}" tidak ditemukan.`, isError: true, actions: [] };
+      }
+      if (verb === 'SHUFFLE') {
+        const on = ['on', '1', 'true'].includes(arg.toLowerCase());
+        return { output: `Mode Acak (Shuffle) diaktifkan [${on ? 'ON' : 'OFF'}]`, actions: [{type: 'shuffle', value: on}] };
+      }
+      if (verb === 'REPEAT') {
+        const on = ['on', '1', 'true'].includes(arg.toLowerCase());
+        return { output: `Mode Putar Ulang (Repeat) diaktifkan [${on ? 'ON' : 'OFF'}]`, actions: [{type: 'repeat', value: on}] };
+      }
+      if (verb === 'HELP') {
+        return {
+          output: 'Perintah CLI: PLAY [judul], PAUSE, NEXT, PREV, QUEUE [judul], VOLUME [0-100], SHUFFLE ON|OFF, REPEAT ON|OFF',
+          actions: []
+        };
+      }
+      return { output: `ERROR: Perintah "${verb}" tidak dikenal. Ketik "HELP".`, isError: true, actions: [] };
+    }
+
+    function executeLocalNlpFallback(queryStr) {
+      const q = (queryStr || '').toLowerCase();
+      if (q.includes('pause') || q.includes('jeda') || q.includes('berhenti') || q.includes('stop') || q.includes('diam')) {
+        return { output: 'Asisten AI: Pemutaran lagu dijeda sementara.', actions: [{type: 'pause'}] };
+      }
+      if (q.includes('lanjut') || q.includes('teruskan') || q.includes('putar lagi') || (q.includes('play') && !q.includes('lagu'))) {
+        return { output: 'Asisten AI: Melanjutkan pemutaran musik.', actions: [{type: 'resume'}] };
+      }
+      if (q.includes('next') || q.includes('skip') || q.includes('ganti') || q.includes('berikut') || q.includes('lagu berikutnya')) {
+        return { output: 'Asisten AI: Beralih ke track berikutnya.', actions: [{type: 'next'}] };
+      }
+      if (q.includes('kembali') || q.includes('mundur') || q.includes('sebelum') || q.includes('prev') || q.includes('balik')) {
+        return { output: 'Asisten AI: Mengulang kembali lagu sebelumnya.', actions: [{type: 'prev'}] };
+      }
+      const mVol = q.match(/volume.*?(\d+)/);
+      if (mVol) {
+        const v = Math.max(0, Math.min(100, parseInt(mVol[1], 10)));
+        return { output: `Asisten AI: Tingkat volume diatur ke ${v}%.`, actions: [{type: 'volume', value: v}] };
+      }
+      if (q.includes('volume') || q.includes('suara') || q.includes('bunyi')) {
+        if (q.includes('kecil') || q.includes('pelan') || q.includes('turun') || q.includes('rendah') || q.includes('kurang')) {
+          return { output: 'Asisten AI: Baik, tingkat volume dikecilkan 20%.', actions: [{type: 'volume_delta', value: -20}] };
+        }
+        if (q.includes('besar') || q.includes('keras') || q.includes('naik') || q.includes('tambah') || q.includes('kencang')) {
+          return { output: 'Asisten AI: Siap! Volume dinaikkan 20%.', actions: [{type: 'volume_delta', value: 20}] };
+        }
+      }
+      for (const s of SONGS) {
+        if (q.includes(s.title.toLowerCase()) || q.includes(s.title.toLowerCase().replace('?', ''))) {
+          return { output: `Asisten AI: Memutar "${s.title}" dari album ${s.album}.`, actions: [{type: 'play', id: s.id}] };
+        }
+      }
+      if (q.includes('galau') || q.includes('sedih') || q.includes('malam')) {
+        const s = SONGS.find(x => x.id === 9) || SONGS[0];
+        return { output: `Asisten AI: Menemukan lagu bernuansa galau/malam: "${s.title}" (${s.album}).`, actions: [{type: 'play', id: s.id}] };
+      }
+      if (q.includes('santai') || q.includes('nugas')) {
+        const s = SONGS.find(x => x.id === 1) || SONGS[0];
+        return { output: `Asisten AI: Menemukan lagu bernuansa santai nugas: "${s.title}" (${s.album}).`, actions: [{type: 'play', id: s.id}] };
+      }
+      if (q.includes('semangat') || q.includes('rock') || q.includes('ngebeat') || q.includes('olahraga')) {
+        const s = SONGS.find(x => x.id === 2) || SONGS[0];
+        return { output: `Asisten AI: Menemukan lagu bernuansa energik: "${s.title}" (${s.album}).`, actions: [{type: 'play', id: s.id}] };
+      }
+      return {
+        output: 'Asisten AI: Maaf, saya belum memahami kalimat tersebut. Coba: "putar Arabella", "lagu galau", atau "kecilkan volumenya".',
+        actions: []
+      };
+    }
+
+    function executeLocalBatchFallback(scriptStr, logBox) {
+      logBox.innerHTML = '';
+      const lines = (scriptStr || '').split('\n');
+      const accumulatedActions = [];
+      lines.forEach((line, idx) => {
+        const clean = line.trim();
+        if (!clean || clean.startsWith('#')) {
+          if (clean.startsWith('#')) {
+            const row = document.createElement('div');
+            row.className = 'text-gray-500 italic';
+            row.textContent = `[Line ${(idx+1).toString().padStart(2, '0')}] KOMENTAR: ${clean}`;
+            logBox.appendChild(row);
+          }
+          return;
+        }
+        const res = executeLocalCliFallback(clean);
+        const row = document.createElement('div');
+        row.className = res.isError ? 'text-red-400' : 'text-orange-200';
+        row.textContent = `[Line ${(idx+1).toString().padStart(2, '0')} | ${res.isError ? 'FAIL' : 'OK'}] ${clean} => ${res.output}`;
+        logBox.appendChild(row);
+        if (res.actions) accumulatedActions.push(...res.actions);
+      });
+      const sum = document.createElement('div');
+      sum.className = 'text-[#FF8A65] font-bold mt-1.5 pt-1 border-t border-white/5';
+      sum.textContent = `>>> Selesai: ${accumulatedActions.length} aksi diproses dari skrip batch.`;
+      logBox.appendChild(sum);
+      accumulatedActions.forEach(executeAction);
     }
 
     // ==========================================================================
@@ -1871,16 +2048,53 @@ PLAY "Arabella"`;
       document.getElementById('playlistModal').classList.add('hidden');
     }
 
+    function renderPlaylistsList(list) {
+      const container = document.getElementById('sidebarPlaylistsList');
+      if (!container) return;
+      container.innerHTML = '';
+      const items = list || [];
+      items.forEach(p => {
+        const row = document.createElement('div');
+        row.className = "px-2.5 py-1.5 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between text-xs text-gray-300 transition group";
+        row.innerHTML = `
+          <span class="truncate">${p.name}</span>
+          <span class="text-[9px] bg-white/5 group-hover:bg-[#E56B45]/20 group-hover:text-[#E56B45] px-1.5 py-0.5 rounded font-mono">${p.genre}</span>
+        `;
+        row.onclick = () => alert(`Playlist: ${p.name}\nGenre: ${p.genre}\nMood: ${p.mood}\nPrivasi: ${p.visibility}`);
+        container.appendChild(row);
+      });
+    }
+
     async function handlePlaylistSubmit(e) {
       e.preventDefault();
       document.getElementById('errPlaylistName').classList.add('hidden');
       document.getElementById('errPlaylistGenre').classList.add('hidden');
 
-      const name = document.getElementById('formPlaylistName').value;
-      const desc = document.getElementById('formPlaylistDesc').value;
+      const name = document.getElementById('formPlaylistName').value.trim();
+      const desc = document.getElementById('formPlaylistDesc').value.trim();
       const genre = document.getElementById('formPlaylistGenre').value;
       const mood = document.getElementById('formPlaylistMood').value;
       const vis = document.querySelector('input[name="playlistVisibility"]:checked').value;
+
+      let hasClientErr = false;
+      if (!name) {
+        const el = document.getElementById('errPlaylistName');
+        el.textContent = "Nama playlist wajib diisi!";
+        el.classList.remove('hidden');
+        hasClientErr = true;
+      } else if (name.length < 3) {
+        const el = document.getElementById('errPlaylistName');
+        el.textContent = "Nama playlist minimal 3 karakter!";
+        el.classList.remove('hidden');
+        hasClientErr = true;
+      }
+      if (!genre) {
+        const el = document.getElementById('errPlaylistGenre');
+        el.textContent = "Pilih salah satu genre musik!";
+        el.classList.remove('hidden');
+        hasClientErr = true;
+      }
+      if (hasClientErr) return;
 
       try {
         const res = await fetch('/api/playlist', {
@@ -1888,6 +2102,8 @@ PLAY "Arabella"`;
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({name, description: desc, genre, mood, visibility: vis})
         });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const text = await res.text();
         const data = JSON.parse(text);
@@ -1909,32 +2125,35 @@ PLAY "Arabella"`;
         closeCreatePlaylistModal();
         await fetchPlaylists();
       } catch (err) {
-        console.error("Gagal submit playlist:", err);
+        console.warn("Backend /api/playlist offline/gagal, menyimpan ke playlist lokal:", err);
+        LOCAL_USER_PLAYLISTS.push({
+          id: LOCAL_USER_PLAYLISTS.length + 1,
+          name: name,
+          description: desc || "Tanpa deskripsi.",
+          genre: genre,
+          mood: mood,
+          visibility: vis,
+          song_count: 0
+        });
+        renderPlaylistsList(LOCAL_USER_PLAYLISTS);
+        closeCreatePlaylistModal();
       }
     }
 
     async function fetchPlaylists() {
       try {
         const res = await fetch('/api/playlist');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
         const data = JSON.parse(text);
-        const container = document.getElementById('sidebarPlaylistsList');
-        container.innerHTML = '';
 
-        if (data.playlists) {
-          data.playlists.forEach(p => {
-            const row = document.createElement('div');
-            row.className = "px-2.5 py-1.5 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between text-xs text-gray-300 transition group";
-            row.innerHTML = `
-              <span class="truncate">${p.name}</span>
-              <span class="text-[9px] bg-white/5 group-hover:bg-[#E56B45]/20 group-hover:text-[#E56B45] px-1.5 py-0.5 rounded font-mono">${p.genre}</span>
-            `;
-            row.onclick = () => alert(`Playlist: ${p.name}\nGenre: ${p.genre}\nMood: ${p.mood}\nPrivasi: ${p.visibility}`);
-            container.appendChild(row);
-          });
+        if (data.playlists && data.playlists.length > 0) {
+          LOCAL_USER_PLAYLISTS = data.playlists;
+          renderPlaylistsList(data.playlists);
         }
       } catch (e) {
-        console.error("Playlist error:", e);
+        console.warn("Backend /api/playlist offline, menggunakan daftar playlist lokal:", e);
+        renderPlaylistsList(LOCAL_USER_PLAYLISTS);
       }
     }
 
@@ -2033,7 +2252,7 @@ PLAY "Arabella"`;
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({queue_ids: QUEUE})
-        });
+        }).catch(err => console.warn('Backend /api/queue/reorder offline:', err));
         renderQueueList();
       }
       this.classList.remove('border-t-2', 'border-[#E56B45]');

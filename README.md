@@ -82,4 +82,13 @@ Aplikasi memutar audio nyata melalui elemen HTML5 `<audio>` yang terhubung ke st
    python app.py
    ```
 3. **Buka di Browser:**
-   Akses: **`http://127.0.0.1:5000`**
+   Akses salah satu alamat berikut di peramban (Chrome, Edge, Firefox):
+   - **`http://127.0.0.1:5000`** atau **`http://localhost:5000`**
+
+---
+
+## 🛡️ Keandalan & Penanganan Error (Zero Failed to Fetch)
+- **CORS Otomatis (`@app.after_request` & `@app.before_request`):** Seluruh response API dilengkapi header `Access-Control-Allow-Origin: *`, `Access-Control-Allow-Headers: Content-Type, Authorization`, dan preflight HTTP `OPTIONS` 200 OK.
+- **Path Relatif:** Seluruh pemanggilan `fetch()` menggunakan path relatif (`/api/songs`, `/api/cli`, `/api/batch`, `/api/nlp`, `/api/playlist`, `/api/queue/reorder`) sehingga tidak bergantung pada hardcoded IP/port.
+- **Host Binding `0.0.0.0:5000`:** Memungkinkan server diakses secara fleksibel dari `localhost`, `127.0.0.1`, maupun jaringan lokal LAN.
+- **Client-Side Fallback Engine:** Jika jaringan browser sempat terputus atau server sedang restart, antarmuka web secara otomatis mengalihkan parsing CLI, NLP, Batch Script, dan Playlist ke engine parser lokal tanpa memunculkan error atau memutus respons tombol.

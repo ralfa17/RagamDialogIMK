@@ -26,6 +26,30 @@ os.makedirs(AUDIO_DIR, exist_ok=True)
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 
+# ==============================================================================
+# KONFIGURASI CORS (Cross-Origin Resource Sharing)
+# Memastikan semua request API diizinkan di seluruh origin dan port browser
+# ==============================================================================
+@app.before_request
+def handle_options_preflight():
+    """Menangani request preflight HTTP OPTIONS dari browser."""
+    if request.method == "OPTIONS":
+        response = app.make_default_options_response()
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
+        return response, 200
+
+
+@app.after_request
+def add_cors_headers(response):
+    """Menambahkan header CORS ke setiap respons endpoint Flask."""
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
+    return response
+
+
 # In-memory cache untuk response iTunes API
 ITUNES_CACHE = {}
 
@@ -530,10 +554,13 @@ def parse_and_execute_command(command_line):
 
 
 # --- Endpoint CLI: Selalu kembalikan JSON valid dengan status 200 ---
-@app.route("/api/cli", methods=["GET", "POST"])
+@app.route("/api/cli", methods=["GET", "POST", "OPTIONS"])
 def api_cli():
     """Endpoint Ragam Dialog 1: Menerima perintah teks tunggal dari CLI Terminal."""
     try:
+        if request.method == "OPTIONS":
+            return jsonify({"status": "ok"}), 200
+
         if request.method == "GET":
             return jsonify({
                 "status": "ok",
@@ -578,10 +605,13 @@ def api_cli():
 
 
 # --- Endpoint Batch: Selalu kembalikan JSON valid dengan status 200 ---
-@app.route("/api/batch", methods=["GET", "POST"])
+@app.route("/api/batch", methods=["GET", "POST", "OPTIONS"])
 def api_batch():
     """Endpoint Ragam Dialog 2: Mengeksekusi blok kode batch script secara sekuensial."""
     try:
+        if request.method == "OPTIONS":
+            return jsonify({"status": "ok"}), 200
+
         if request.method == "GET":
             return jsonify({
                 "status": "ok",
@@ -643,10 +673,13 @@ NLP_KEYWORDS = {
     "populer": [1, 2, 9]   # Do I Wanna Know?, R U Mine?, 505
 }
 
-@app.route("/api/nlp", methods=["GET", "POST"])
+@app.route("/api/nlp", methods=["GET", "POST", "OPTIONS"])
 def api_nlp():
     """Endpoint Ragam Dialog 3: Natural Language Processing untuk Bahasa Indonesia."""
     try:
+        if request.method == "OPTIONS":
+            return jsonify({"status": "ok"}), 200
+
         if request.method == "GET":
             return jsonify({
                 "status": "ok",
@@ -757,33 +790,42 @@ def api_nlp():
 # ==============================================================================
 # RAGAM DIALOG 4: SISTEM MENU (Flat Navigation & Pulldown Menus)
 # ==============================================================================
-@app.get("/api/menus")
+@app.route("/api/menus", methods=["GET", "OPTIONS"])
 def api_menus():
     """Menyediakan metadata konfigurasi menu datar & menu tarik."""
-    return jsonify({
-        "status": "ok",
-        "flat_menus": [
-            {"id": "home", "label": "Home", "icon": "home"},
-            {"id": "albums", "label": "Albums", "icon": "disc-3"},
-            {"id": "tracks", "label": "Tracks", "icon": "music-2"},
-            {"id": "lab", "label": "IMK Lab", "icon": "terminal"}
-        ],
-        "pulldown_options": [
-            {"id": "play", "label": "Play Now", "icon": "play"},
-            {"id": "queue", "label": "Add to Queue", "icon": "list-plus"},
-            {"id": "lyrics", "label": "View Lyrics", "icon": "file-text"},
-            {"id": "remove", "label": "Remove from Queue", "icon": "trash-2"}
-        ]
-    }), 200
+    try:
+        if request.method == "OPTIONS":
+            return jsonify({"status": "ok"}), 200
+
+        return jsonify({
+            "status": "ok",
+            "flat_menus": [
+                {"id": "home", "label": "Home", "icon": "home"},
+                {"id": "albums", "label": "Albums", "icon": "disc-3"},
+                {"id": "tracks", "label": "Tracks", "icon": "music-2"},
+                {"id": "lab", "label": "IMK Lab", "icon": "terminal"}
+            ],
+            "pulldown_options": [
+                {"id": "play", "label": "Play Now", "icon": "play"},
+                {"id": "queue", "label": "Add to Queue", "icon": "list-plus"},
+                {"id": "lyrics", "label": "View Lyrics", "icon": "file-text"},
+                {"id": "remove", "label": "Remove from Queue", "icon": "trash-2"}
+            ]
+        }), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 200
 
 
 # ==============================================================================
 # RAGAM DIALOG 5: DIALOG PENGISIAN FORMULIR (Form Filling Dialogue)
 # ==============================================================================
-@app.route("/api/playlist", methods=["GET", "POST"])
+@app.route("/api/playlist", methods=["GET", "POST", "OPTIONS"])
 def api_playlist():
     """Endpoint manajemen playlist pengguna."""
     try:
+        if request.method == "OPTIONS":
+            return jsonify({"status": "ok"}), 200
+
         if request.method == "GET":
             return jsonify({"status": "ok", "playlists": USER_PLAYLISTS}), 200
 
@@ -835,10 +877,13 @@ def api_playlist():
 # ==============================================================================
 # RAGAM DIALOG 8 & 9: MANIPULASI LANGSUNG & INTERAKSI GRAFIS
 # ==============================================================================
-@app.route("/api/queue/reorder", methods=["GET", "POST"])
+@app.route("/api/queue/reorder", methods=["GET", "POST", "OPTIONS"])
 def api_reorder_queue():
     """Menerima susunan baru antrean hasil Drag-and-Drop (Manipulasi Langsung)."""
     try:
+        if request.method == "OPTIONS":
+            return jsonify({"status": "ok"}), 200
+
         payload = request.get_json(silent=True) or {}
         new_order = payload.get("queue_ids", [])
         return jsonify({"status": "ok", "queue_ids": new_order}), 200
@@ -846,10 +891,13 @@ def api_reorder_queue():
         return jsonify({"status": "error", "message": str(e)}), 200
 
 
-@app.get("/api/songs")
+@app.route("/api/songs", methods=["GET", "OPTIONS"])
 def api_songs():
     """Mengembalikan 10 lagu Arctic Monkeys lengkap dengan URL audio real dan cover."""
     try:
+        if request.method == "OPTIONS":
+            return jsonify({"status": "ok"}), 200
+
         songs = get_enriched_songs()
         return jsonify({
             "status": "ok",
@@ -865,15 +913,17 @@ def api_songs():
         }), 200
 
 
-@app.get("/")
+@app.route("/", methods=["GET", "OPTIONS"])
 def index():
     """Merender antarmuka pengguna Playcloud UI modern."""
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
     return render_template("index.html")
 
 
 if __name__ == "__main__":
     print("=" * 70)
     print(" PLAYCLOUD MUSIC PLAYER - ARCTIC MONKEYS EDITION BERJALAN")
-    print(" Buka di browser: http://127.0.0.1:5000")
+    print(" Buka di browser: http://127.0.0.1:5000 atau http://localhost:5000")
     print("=" * 70)
-    app.run(debug=True, host="127.0.0.1", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
