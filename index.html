@@ -1,0 +1,2419 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playcloud - Arctic Monkeys Music Experience | IMK Ragam Dialog</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              terracotta: '#E56B45',
+              hover: '#F27A54',
+              soft: '#FF8A65',
+              glow: 'rgba(229, 107, 69, 0.25)',
+              bg: '#0E0E10',
+              panel: '#18181C',
+              card: '#1F1F24',
+              border: 'rgba(255, 255, 255, 0.07)'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbar Minimalis */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(229, 107, 69, 0.5);
+    }
+
+    input[type=range] {
+      accent-color: #E56B45;
+      cursor: pointer;
+    }
+
+    /* IMK Inspector Mode Badges & Outlines */
+    .imk-inspect-badge {
+      display: none;
+    }
+    body.imk-inspector-active .imk-inspect-badge {
+      display: inline-flex;
+    }
+    body.imk-inspector-active [data-imk-target] {
+      outline: 2px dashed #E56B45 !important;
+      outline-offset: 3px;
+      position: relative;
+    }
+    body.imk-inspector-active [data-imk-target]:hover {
+      outline-color: #FF8A65 !important;
+    }
+
+    #waveformCanvas {
+      width: 100%;
+      height: 48px;
+      display: block;
+    }
+  </style>
+</head>
+<body class="bg-[#0E0E10] text-gray-200 font-sans h-screen flex flex-col overflow-hidden select-none">
+
+  <!-- REAL HTML5 AUDIO ELEMENT -->
+  <audio id="realAudio" preload="auto"></audio>
+
+  <!-- BANNER NOTIFIKASI IMK INSPECTOR MODE -->
+  <div id="inspectorBanner" class="hidden bg-gradient-to-r from-[#8B341B] via-[#E56B45] to-[#B84E2F] text-black text-xs font-semibold px-4 py-1.5 flex items-center justify-between z-50 shrink-0 shadow-lg">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
+      <span class="font-extrabold tracking-wide uppercase">🔍 IMK Inspector Mode Aktif:</span>
+      <span class="text-white font-medium">Batas teori dan label 9 Ragam Dialog Interaktif ditampilkan. Klik badge oranye untuk modal teori.</span>
+    </div>
+    <span class="text-[11px] bg-black/40 text-white px-2 py-0.5 rounded font-mono">Tugas Besar IMK</span>
+  </div>
+
+  <!-- CONTAINER 3 KOLOM UTAMA -->
+  <div class="flex flex-1 min-h-0 overflow-hidden relative">
+
+    <!-- ====================================================================
+         KOLOM 1: SIDEBAR KIRI (4a. SISTEM MENU DATAR / FLAT MENU)
+         ==================================================================== -->
+    <aside data-imk-target="menu-flat" class="w-64 bg-[#141417] border-r border-white/5 flex flex-col p-4 shrink-0 justify-between z-20">
+      <div>
+        <!-- Badge IMK Inspector -->
+        <div class="imk-inspect-badge mb-2 items-center gap-1.5 bg-[#E56B45] text-white font-extrabold text-[11px] px-2 py-0.5 rounded-md shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(4, 'Sistem Menu Datar (Flat Menu)')">
+          <i data-lucide="tag" class="w-3 h-3"></i> [IMK-4a] Flat Menu & Highlight
+        </div>
+
+        <!-- Brand Header (Playcloud UI) -->
+        <div class="flex items-center gap-3 px-2 py-3 mb-4 cursor-pointer" onclick="switchView('home')">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#E56B45] to-[#FF8A65] flex items-center justify-center text-white shadow-lg shadow-[#E56B45]/20">
+            <i data-lucide="play" class="w-5 h-5 fill-white ml-0.5"></i>
+          </div>
+          <div>
+            <h1 class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+              Playcloud <span class="text-[9px] bg-[#E56B45]/20 text-[#E56B45] border border-[#E56B45]/30 px-1.5 py-0.5 rounded-full font-mono">PRO</span>
+            </h1>
+            <p class="text-[11px] text-gray-400">Arctic Monkeys Edition</p>
+          </div>
+        </div>
+
+        <!-- 4a. Flat Menu Navigasi Utama -->
+        <div class="text-[10px] uppercase font-bold text-gray-500 tracking-wider px-3 mb-2">Menu Utama</div>
+        <nav class="space-y-1" id="sidebarNav">
+          <button onclick="switchView('home')" id="nav-home" class="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition text-white bg-[#E56B45]/15 border-l-4 border-[#E56B45] shadow-sm">
+            <i data-lucide="home" class="w-4 h-4"></i>
+            <span>Home</span>
+          </button>
+          <button onclick="switchView('albums')" id="nav-albums" class="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent">
+            <i data-lucide="disc-3" class="w-4 h-4"></i>
+            <span>Albums</span>
+          </button>
+          <button onclick="switchView('tracks')" id="nav-tracks" class="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent">
+            <i data-lucide="music-2" class="w-4 h-4"></i>
+            <span>10 Tracks</span>
+          </button>
+          <button onclick="switchView('lab')" id="nav-lab" class="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span class="flex items-center justify-between flex-1">
+              IMK Lab
+              <span class="text-[9px] bg-[#E56B45]/20 text-[#FF8A65] px-1.5 py-0.5 rounded font-mono">CLI+Batch</span>
+            </span>
+          </button>
+        </nav>
+
+        <!-- Divider -->
+        <hr class="border-white/5 my-4">
+
+        <!-- Playlists / Library Section -->
+        <div class="px-2">
+          <div class="flex items-center justify-between text-[10px] uppercase font-bold text-gray-500 tracking-wider px-1 mb-2">
+            <span>Playlists</span>
+            <button onclick="openCreatePlaylistModal()" title="Buat Playlist Baru (IMK-5)" class="w-5 h-5 rounded-md hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-[#E56B45] transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <div id="sidebarPlaylistsList" class="space-y-1 text-xs text-gray-300 max-h-40 overflow-y-auto pr-1">
+            <!-- Diisi dari fetch /api/playlist -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Info Box -->
+      <div class="bg-[#18181C] rounded-2xl p-3 border border-white/5 text-[11px] text-gray-400">
+        <div class="font-semibold text-gray-200 mb-1 flex items-center gap-1.5">
+          <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-[#E56B45]"></i>
+          Tugas Besar IMK
+        </div>
+        <p class="leading-relaxed text-[10px]">9 Kategori Ragam Dialog Interaktif terintegrasi penuh.</p>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         KOLOM 2: AREA UTAMA (TENGAH)
+         ==================================================================== -->
+    <div class="flex-1 flex flex-col min-w-0 bg-[#0E0E10] overflow-hidden">
+      
+      <!-- TOP HEADER BAR -->
+      <header class="h-16 bg-[#121215]/80 backdrop-blur-md px-6 flex items-center justify-between gap-4 border-b border-white/5 shrink-0 z-20">
+        
+        <!-- Navigation History Buttons -->
+        <div class="flex items-center gap-2">
+          <button onclick="switchView('home')" title="Home" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300 hover:text-white transition">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          </button>
+          <button onclick="switchView('lab')" title="IMK Lab" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-300 hover:text-white transition">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- ====================================================================
+             3. ANTARMUKA BERBASIS BAHASA ALAMI (NATURAL LANGUAGE INTERFACE)
+             ==================================================================== -->
+        <div data-imk-target="nlp" class="flex-1 max-w-xl relative">
+          <!-- Badge IMK Inspector -->
+          <div class="imk-inspect-badge absolute -top-5 left-2 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(3, 'Antarmuka Berbasis Bahasa Alami (Natural Language Interface)')">
+            <i data-lucide="tag" class="w-3 h-3"></i> [IMK-3] Natural Language Interface
+          </div>
+
+          <div class="relative flex items-center">
+            <i data-lucide="sparkles" class="w-4 h-4 text-[#E56B45] absolute left-3 pointer-events-none"></i>
+            <input 
+              id="nlpInput" 
+              type="text" 
+              placeholder='Smart Assistant: "Putar lagu galau", "Putar Arabella", "Kecilkan volume"...'
+              class="w-full bg-[#18181C] hover:bg-[#1E1E24] focus:bg-[#1E1E24] text-white text-xs pl-9 pr-24 py-2 rounded-full border border-white/10 focus:border-[#E56B45] outline-none transition placeholder-gray-500 shadow-inner"
+              onkeydown="if(event.key === 'Enter'){ event.preventDefault(); sendNlpQuery(); }"
+            >
+            <button 
+              id="nlpSubmitBtn"
+              onclick="sendNlpQuery()" 
+              class="absolute right-1.5 bg-[#E56B45] hover:bg-[#F27A54] text-white text-xs font-semibold px-3 py-1 rounded-full transition flex items-center gap-1 shadow-sm"
+            >
+              <span>Kirim</span>
+              <i data-lucide="send" class="w-3 h-3"></i>
+            </button>
+          </div>
+
+          <!-- Quick Prompts Chips -->
+          <div class="flex items-center gap-1.5 mt-1 overflow-x-auto no-scrollbar py-0.5">
+            <span class="text-[9px] text-gray-500 font-mono">Contoh:</span>
+            <button onclick="setNlpAndSend('Putar Arabella')" class="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/5">"Putar Arabella"</button>
+            <button onclick="setNlpAndSend('Putar lagu galau')" class="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/5">"Lagu galau"</button>
+            <button onclick="setNlpAndSend('Lagu semangat rock')" class="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/5">"Semangat rock"</button>
+            <button onclick="setNlpAndSend('Kecilkan volume')" class="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/5">"Kecilkan volume"</button>
+            <button onclick="setNlpAndSend('Jeda musik')" class="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/5">"Jeda musik"</button>
+          </div>
+        </div>
+
+        <!-- RIGHT HEADER CONTROLS -->
+        <div class="flex items-center gap-2.5">
+          
+          <!-- QUICK TERMINAL MODAL BUTTON -->
+          <button 
+            onclick="openQuickCliModal()" 
+            class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition"
+            title="Buka Terminal CLI (Ctrl+K)"
+          >
+            <i data-lucide="terminal" class="w-3.5 h-3.5 text-[#E56B45]"></i>
+            <span class="hidden lg:inline">Terminal</span>
+            <kbd class="text-[9px] bg-black/40 px-1 py-0.5 rounded text-gray-400 font-mono">^K</kbd>
+          </button>
+
+          <!-- IMK INSPECTOR MODE TOGGLE -->
+          <button 
+            id="btnInspectorToggle" 
+            onclick="toggleImkInspector()" 
+            class="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 transition"
+            title="Aktifkan label teori IMK di setiap komponen"
+          >
+            <i data-lucide="layers" class="w-3.5 h-3.5 text-[#E56B45]"></i>
+            <span id="inspectorBtnText">IMK Inspector</span>
+          </button>
+
+          <!-- ====================================================================
+               4b. SISTEM MENU TARIK (PULLDOWN MENU) - PROFIL MAHASISWA
+               ==================================================================== -->
+          <div data-imk-target="menu-pulldown" class="relative">
+            <!-- Badge IMK Inspector -->
+            <div class="imk-inspect-badge absolute -top-5 right-0 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(4, 'Sistem Menu Tarik (Pulldown Menu)')">
+              <i data-lucide="tag" class="w-3 h-3"></i> [IMK-4b] Pulldown Menu
+            </div>
+
+            <button 
+              id="profileBtn" 
+              onclick="toggleProfileMenu(event)" 
+              class="flex items-center gap-2 bg-[#18181C] hover:bg-[#222228] p-1 pr-2.5 rounded-full border border-white/10 transition"
+            >
+              <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#E56B45] to-[#FF8A65] text-white font-bold flex items-center justify-center text-xs shadow">
+                AM
+              </div>
+              <span class="text-xs font-semibold text-gray-200 hidden md:inline">Mahasiswa IMK</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400"></i>
+            </button>
+
+            <!-- Pulldown Dropdown -->
+            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-56 bg-[#18181C] border border-white/10 rounded-2xl shadow-2xl py-1.5 z-50 text-xs">
+              <div class="px-4 py-2 border-b border-white/5">
+                <p class="font-bold text-white">Praktikum IMK</p>
+                <p class="text-[10px] text-gray-400">Topik: Ragam Dialog Interaktif</p>
+              </div>
+              <a href="#" onclick="showImkSummaryModal(); return false;" class="flex items-center gap-2.5 px-4 py-2 text-gray-200 hover:bg-white/5 hover:text-[#E56B45] transition">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                <span>Ringkasan 9 Ragam Dialog</span>
+              </a>
+              <a href="#" onclick="toggleSideDock(); return false;" class="flex items-center gap-2.5 px-4 py-2 text-gray-200 hover:bg-white/5 hover:text-[#E56B45] transition">
+                <i data-lucide="sidebar" class="w-3.5 h-3.5"></i>
+                <span>Buka/Tutup Right Dock</span>
+              </a>
+              <a href="#" onclick="openCreatePlaylistModal(); return false;" class="flex items-center gap-2.5 px-4 py-2 text-gray-200 hover:bg-white/5 hover:text-[#E56B45] transition">
+                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                <span>Form Buat Playlist</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- NOTIFIKASI RESPON ASISTEN NLP -->
+      <div id="nlpFeedbackBar" class="hidden bg-[#18181C] border-b border-[#E56B45]/30 px-6 py-2.5 flex items-center justify-between text-xs transition duration-300">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="bot" class="w-4 h-4 text-[#E56B45]"></i>
+          <span id="nlpFeedbackText" class="text-orange-200 font-mono text-[11px]"></span>
+        </div>
+        <button onclick="document.getElementById('nlpFeedbackBar').classList.add('hidden')" class="text-gray-400 hover:text-white">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+
+      <!-- MAIN SCROLLABLE VIEWPORT -->
+      <main class="flex-1 overflow-y-auto p-6 space-y-8">
+        
+        <!-- ====================================================================
+             VIEW 1: HOME (BERANDA & HERO BANNER)
+             ==================================================================== -->
+        <section id="view-home" class="space-y-8">
+          
+          <!-- HERO CURATED PLAYLIST BANNER (Warm Terracotta Gradient, rounded-3xl) -->
+          <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#E56B45] via-[#B84E2F] to-[#241310] p-7 md:p-8 text-white shadow-2xl border border-white/10">
+            <div class="relative z-10 max-w-2xl">
+              <div class="inline-flex items-center gap-1.5 bg-black/30 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase mb-3 border border-white/10 text-orange-200">
+                <i data-lucide="sparkles" class="w-3 h-3 text-orange-300"></i>
+                <span>Featured Artist Spotlight</span>
+              </div>
+              <h2 class="text-2xl md:text-4xl font-black tracking-tight mb-2 leading-tight">
+                Arctic Monkeys
+              </h2>
+              <p class="text-xs md:text-sm text-orange-100/90 leading-relaxed mb-6 font-normal">
+                Koleksi 10 lagu indie rock legendaris asal Sheffield, UK. Dilengkapi pemutar audio lokal, vector artwork 100% lokal, dan Web Audio API Ambient Synthesizer fallback.
+              </p>
+              
+              <div class="flex flex-wrap items-center gap-3">
+                <button onclick="playTrackById(1)" class="bg-white hover:bg-orange-50 text-black font-bold text-xs px-5 py-2.5 rounded-full transition flex items-center gap-2 shadow-lg">
+                  <i data-lucide="play" class="w-4 h-4 fill-black"></i>
+                  <span>Play All (Track 1)</span>
+                </button>
+                <button onclick="switchView('albums')" class="bg-black/40 hover:bg-black/60 text-white font-semibold text-xs px-4 py-2.5 rounded-full transition border border-white/20 flex items-center gap-2">
+                  <i data-lucide="disc-3" class="w-4 h-4 text-[#E56B45]"></i>
+                  <span>Lihat Diskografi Album</span>
+                </button>
+                <button onclick="switchView('lab')" class="bg-black/40 hover:bg-black/60 text-white font-semibold text-xs px-4 py-2.5 rounded-full transition border border-white/20 flex items-center gap-2">
+                  <i data-lucide="terminal" class="w-4 h-4 text-[#E56B45]"></i>
+                  <span>Buka IMK Lab</span>
+                </button>
+                <span class="text-xs text-orange-200/80 font-mono ml-1">10 Songs • 38 Mins</span>
+              </div>
+            </div>
+
+            <!-- Decorative Watermark Cover Art -->
+            <div class="absolute -right-8 -bottom-8 opacity-20 pointer-events-none text-white">
+              <i data-lucide="disc-3" class="w-72 h-72"></i>
+            </div>
+          </div>
+
+          <!-- ====================================================================
+               9a. ANTARMUKA BERBASIS INTERAKSI GRAFIS (GRID KARTU LAGU)
+               ==================================================================== -->
+          <div data-imk-target="graphical-grid" class="relative">
+            <!-- Badge IMK Inspector -->
+            <div class="imk-inspect-badge absolute -top-5 left-0 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(9, 'Antarmuka Berbasis Interaksi Grafis (Graphical Album Grid)')">
+              <i data-lucide="tag" class="w-3 h-3"></i> [IMK-9a] Graphical Album Grid
+            </div>
+
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-lg font-bold text-white tracking-tight">Koleksi 10 Lagu Pilihan</h3>
+                <p class="text-xs text-gray-400">Vector SVG Album Art lokal 100% muncul di semua browser</p>
+              </div>
+              <button onclick="switchView('tracks')" class="text-xs text-[#E56B45] hover:underline font-semibold flex items-center gap-1">
+                <span>Lihat Tabel Semua Lagu</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+
+            <!-- Grid Container Album Cards -->
+            <div id="albumGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+              <!-- Diisi JavaScript -->
+            </div>
+          </div>
+
+          <!-- ====================================================================
+               9b. ANTARMUKA BERBASIS INTERAKSI GRAFIS (BAR CHART & RADAR MOOD)
+               ==================================================================== -->
+          <div data-imk-target="graphical-charts" class="relative">
+            <!-- Badge IMK Inspector -->
+            <div class="imk-inspect-badge absolute -top-5 left-0 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(9, 'Interaksi Grafis: Diagram Batang Tempo & Radar Karakteristik')">
+              <i data-lucide="tag" class="w-3 h-3"></i> [IMK-9b] Graphic Bar & Radar Chart
+            </div>
+
+            <h3 class="text-lg font-bold text-white mb-1">Analisis Audio & Karakteristik Musik</h3>
+            <p class="text-xs text-gray-400 mb-4">Visualisasi perbandingan tempo (BPM) dan profil akustik lagu aktif.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              <!-- GRAFIK BATANG TEMPO -->
+              <div class="lg:col-span-2 bg-[#18181C] p-5 rounded-3xl border border-white/5">
+                <div class="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
+                  <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#E56B45]"></i>
+                    Distribusi Tempo Musik (BPM)
+                  </h4>
+                  <span class="text-[10px] text-gray-500">Klik bar untuk memutar</span>
+                </div>
+                <div id="bpmBarChart" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                  <!-- Diisi JavaScript -->
+                </div>
+              </div>
+
+              <!-- RADAR CHART ATRIBUT AUDIO -->
+              <div class="bg-[#18181C] p-5 rounded-3xl border border-white/5 flex flex-col items-center justify-between">
+                <div class="w-full flex items-center justify-between mb-2 border-b border-white/5 pb-2">
+                  <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                    <i data-lucide="activity" class="w-4 h-4 text-[#E56B45]"></i>
+                    Radar Profil Audio
+                  </h4>
+                  <span id="radarActiveSongLabel" class="text-[10px] text-[#E56B45] font-semibold truncate max-w-[120px]"></span>
+                </div>
+                
+                <!-- SVG Radar Chart Container -->
+                <div class="my-2 relative flex items-center justify-center">
+                  <svg id="radarSvg" width="220" height="200" class="overflow-visible"></svg>
+                </div>
+
+                <div class="w-full grid grid-cols-2 gap-2 text-[10px] text-gray-400 bg-black/30 p-2.5 rounded-2xl border border-white/5">
+                  <div>• <b class="text-[#E56B45]">Energy:</b> Kekuatan ritme</div>
+                  <div>• <b class="text-[#E56B45]">Dance:</b> Keluwesan dansa</div>
+                  <div>• <b class="text-[#E56B45]">Valence:</b> Nuansa ceria</div>
+                  <div>• <b class="text-[#E56B45]">Acoustic:</b> Alami/akustik</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ====================================================================
+             VIEW 2: ALBUMS VIEW (DISKOGRAFI ALBUM ARCTIC MONKEYS)
+             ==================================================================== -->
+        <section id="view-albums" class="hidden space-y-6">
+          <div class="border-b border-white/5 pb-3">
+            <h2 class="text-2xl font-bold text-white mb-1">Diskografi Album Arctic Monkeys</h2>
+            <p class="text-xs text-gray-400">Pilih album untuk melihat track dan memutar lagunya secara berurutan.</p>
+          </div>
+          <div id="albumsViewContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Diisi JavaScript -->
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             VIEW 3: TRACKS VIEW (TABEL 10 LAGU LENGKAP)
+             ==================================================================== -->
+        <section id="view-tracks" class="hidden space-y-6">
+          <div class="flex items-center justify-between border-b border-white/5 pb-3">
+            <div>
+              <h2 class="text-2xl font-bold text-white mb-1">Daftar 10 Lagu Arctic Monkeys</h2>
+              <p class="text-xs text-gray-400">Audio playback nyata dengan folder lokal `static/audio/` & Web Audio API fallback.</p>
+            </div>
+            <span class="text-xs bg-[#E56B45]/20 text-[#E56B45] px-3 py-1 rounded-full font-semibold border border-[#E56B45]/30">
+              10 Verified Tracks
+            </span>
+          </div>
+
+          <div class="bg-[#18181C] rounded-3xl border border-white/5 overflow-hidden">
+            <table class="w-full text-left text-xs">
+              <thead class="text-gray-400 border-b border-white/5 bg-black/40 font-semibold uppercase tracking-wider">
+                <tr>
+                  <th class="py-3 px-4 w-12 text-center">#</th>
+                  <th class="py-3 px-4">Cover & Judul Lagu</th>
+                  <th class="py-3 px-4 hidden md:table-cell">Album</th>
+                  <th class="py-3 px-4 hidden sm:table-cell">Mood</th>
+                  <th class="py-3 px-4 text-center">BPM</th>
+                  <th class="py-3 px-4 text-right">Durasi</th>
+                  <th class="py-3 px-4 w-16 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tracksTableBody" class="divide-y divide-white/5">
+                <!-- Diisi JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             VIEW 4: IMK LAB (CLI TERMINAL & PROGRAMMING BATCH SCRIPT)
+             ==================================================================== -->
+        <section id="view-lab" class="hidden space-y-6">
+          <div class="border-b border-white/5 pb-3">
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="terminal" class="w-6 h-6 text-[#E56B45]"></i>
+              IMK Interaction Laboratory
+            </h2>
+            <p class="text-xs text-gray-400">
+              Uji coba fungsionalitas <b>Dialog Perintah Tunggal (CLI)</b> dan <b>Dialog Bahasa Pemrograman (Batch Scripting)</b> yang diproses langsung oleh endpoint Python Flask (`/api/cli` & `/api/batch`).
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- PANEL 1: CLI TERMINAL -->
+            <div data-imk-target="cli" class="bg-[#18181C] rounded-3xl border border-white/5 p-5 flex flex-col justify-between shadow-2xl relative min-h-[460px]">
+              <!-- Badge IMK Inspector -->
+              <div class="imk-inspect-badge absolute -top-5 left-0 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(1, 'Dialog Berbasis Perintah Tunggal (Command Line Dialogue)')">
+                <i data-lucide="tag" class="w-3 h-3"></i> [IMK-1] Command Line Dialogue (CLI)
+              </div>
+
+              <!-- Terminal Header -->
+              <div class="flex items-center justify-between border-b border-white/5 pb-2 mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
+                  <span class="text-xs font-mono text-gray-400 ml-1">playcloud-cli@python:~</span>
+                </div>
+                <button onclick="clearTerminalScreen('labCliScreen')" class="text-[11px] text-gray-500 hover:text-gray-300 font-mono">CLEAR</button>
+              </div>
+
+              <!-- Terminal Screen -->
+              <div id="labCliScreen" class="flex-1 bg-black/60 text-orange-200 font-mono text-xs p-3 rounded-2xl overflow-y-auto space-y-1 border border-white/5 max-h-64">
+                <div class="text-gray-500">=== Playcloud CLI Terminal v2.5 ===</div>
+                <div class="text-gray-500">Ketik '<span class="text-[#E56B45] font-bold">HELP</span>', 'PLAY "505"', 'PAUSE', atau 'VOLUME 70'.</div>
+              </div>
+
+              <!-- Terminal Quick Chips -->
+              <div class="flex items-center gap-1.5 my-2.5 overflow-x-auto no-scrollbar py-1">
+                <span class="text-[10px] text-gray-500 font-mono">Quick:</span>
+                <button onclick="runLabCli('HELP')" class="text-[10px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2.5 py-0.5 rounded-full border border-white/5">HELP</button>
+                <button onclick="runLabCli('PLAY \"Arabella\"')" class="text-[10px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2.5 py-0.5 rounded-full border border-white/5">PLAY "Arabella"</button>
+                <button onclick="runLabCli('PLAY \"505\"')" class="text-[10px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2.5 py-0.5 rounded-full border border-white/5">PLAY "505"</button>
+                <button onclick="runLabCli('PAUSE')" class="text-[10px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2.5 py-0.5 rounded-full border border-white/5">PAUSE</button>
+                <button onclick="runLabCli('VOLUME 80')" class="text-[10px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2.5 py-0.5 rounded-full border border-white/5">VOLUME 80</button>
+              </div>
+
+              <!-- Terminal Input -->
+              <div class="flex items-center gap-2 bg-black/40 rounded-2xl px-3 py-2 border border-white/10">
+                <span class="text-[#E56B45] font-mono text-xs font-bold">&gt;</span>
+                <input 
+                  id="labCliInput" 
+                  type="text" 
+                  placeholder='Ketik perintah (tekan Enter untuk Run)...'
+                  class="flex-1 bg-transparent font-mono text-xs text-white outline-none"
+                  onkeydown="if(event.key === 'Enter'){ event.preventDefault(); submitLabCli(); }"
+                >
+                <button onclick="submitLabCli()" class="bg-[#E56B45] hover:bg-[#F27A54] text-white font-bold text-xs px-3.5 py-1.5 rounded-xl font-mono transition">
+                  RUN
+                </button>
+              </div>
+            </div>
+
+            <!-- PANEL 2: BATCH SCRIPT RUNNER -->
+            <div data-imk-target="batch" class="bg-[#18181C] rounded-3xl border border-white/5 p-5 flex flex-col justify-between shadow-2xl relative min-h-[460px]">
+              <!-- Badge IMK Inspector -->
+              <div class="imk-inspect-badge absolute -top-5 left-0 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(2, 'Dialog Berbasis Bahasa Pemrograman (Batch Script Dialogue)')">
+                <i data-lucide="tag" class="w-3 h-3"></i> [IMK-2] Programming Language Dialogue (Batch)
+              </div>
+
+              <!-- Header -->
+              <div class="flex items-center justify-between border-b border-white/5 pb-2 mb-2">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="file-code-2" class="w-4 h-4 text-[#E56B45]"></i>
+                  <span class="text-xs font-bold text-gray-200">Playlist Batch Script Editor</span>
+                </div>
+                <span class="text-[10px] text-gray-400 font-mono">script.spot</span>
+              </div>
+
+              <textarea 
+                id="batchScriptEditor" 
+                rows="6"
+                class="w-full bg-black/60 text-amber-200 font-mono text-xs p-3 rounded-2xl border border-white/5 focus:border-[#E56B45] outline-none transition leading-relaxed resize-none shadow-inner"
+              ># Batch Script Koleksi Arctic Monkeys
+SET_VOLUME 85
+SHUFFLE ON
+QUEUE "Do I Wanna Know?"
+QUEUE "R U Mine?"
+QUEUE "505"
+PLAY "Arabella"</textarea>
+
+              <div class="flex items-center justify-between my-2">
+                <button onclick="executeBatchScript()" class="bg-[#E56B45] hover:bg-[#F27A54] text-white font-bold text-xs px-4 py-2 rounded-full transition flex items-center gap-2 shadow">
+                  <i data-lucide="play" class="w-3.5 h-3.5 fill-white"></i>
+                  <span>Run Batch Script</span>
+                </button>
+                <button onclick="loadScriptTemplate()" class="text-[11px] text-gray-400 hover:text-white underline font-mono">Reset Script</button>
+              </div>
+
+              <!-- Output Log -->
+              <div class="mt-1 flex-1 bg-black/60 rounded-2xl p-2.5 border border-white/5 max-h-36 overflow-y-auto font-mono text-[11px]">
+                <div class="text-gray-500 text-[9px] uppercase font-bold mb-1">Server Execution Log:</div>
+                <div id="batchLogOutput" class="text-gray-300 space-y-0.5">
+                  <span class="text-gray-600">// Log interpreter batch akan tampil di sini.</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- ====================================================================
+         KOLOM 3: PANEL KANAN (RIGHT DOCK: NOW PLAYING & WAVEFORM)
+         7. Sistem Penjendelaan (Windowing System - Side Dock)
+         9. Interaksi Grafis (Audio Waveform Visualizer)
+         8. Manipulasi Langsung (Drag & Drop Queue)
+         ==================================================================== -->
+    <aside 
+      id="rightDockPanel" 
+      data-imk-target="window-panel" 
+      class="w-80 bg-[#141417] border-l border-white/5 flex flex-col shrink-0 p-4 justify-between transition-all duration-300 relative z-30"
+    >
+      <!-- Badge IMK Inspector -->
+      <div class="imk-inspect-badge absolute -top-5 left-0 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(7, 'Sistem Penjendelaan (Windowing: Right Dock)')">
+        <i data-lucide="tag" class="w-3 h-3"></i> [IMK-7a] Windowing: Right Dock
+      </div>
+
+      <div class="flex-1 overflow-hidden flex flex-col">
+        <!-- Dock Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-white/5 mb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="disc" class="w-4 h-4 text-[#E56B45]"></i>
+            <h3 class="font-bold text-xs uppercase tracking-wider text-white">Now Playing</h3>
+          </div>
+          <button onclick="toggleSideDock()" title="Sembunyikan Panel" class="text-gray-400 hover:text-white transition">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Big Cover Art Card (Playcloud Style, rounded-2xl) -->
+        <div class="bg-[#18181C] rounded-2xl p-3 border border-white/5 mb-4 shadow-xl">
+          <div id="dockCoverContainer" class="w-full aspect-square rounded-xl overflow-hidden mb-3 bg-zinc-900 relative shadow-md">
+            <!-- Vektor SVG Lokal dirender di sini -->
+          </div>
+          
+          <div class="flex items-start justify-between">
+            <div class="min-w-0 flex-1">
+              <h4 id="dockTrackTitle" class="font-bold text-sm text-white truncate">Do I Wanna Know?</h4>
+              <p id="dockTrackAlbum" class="text-xs text-gray-400 truncate">Arctic Monkeys • AM</p>
+            </div>
+            <button id="dockLikeBtn" onclick="toggleLikeCurrentSong()" class="p-1.5 text-gray-400 hover:text-[#E56B45] transition">
+              <i id="dockLikeIcon" data-lucide="heart" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- ====================================================================
+               9c. WAVEFORM AUDIO VISUALIZER (Interaksi Grafis Animasi Real-time)
+               ==================================================================== -->
+          <div data-imk-target="graphical-waveform" class="mt-3 pt-2 border-t border-white/5 relative">
+            <div class="imk-inspect-badge absolute -top-5 left-0 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[9px] px-1.5 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(9, 'Interaksi Grafis: Real-time Audio Waveform')">
+              <i data-lucide="tag" class="w-3 h-3"></i> [IMK-9c] Waveform Visualizer
+            </div>
+            <canvas id="waveformCanvas" width="280" height="48" class="rounded-lg bg-black/40 border border-white/5"></canvas>
+            <div class="flex items-center justify-between text-[10px] text-gray-400 mt-1 font-mono">
+              <span id="dockCurrentTime">0:00</span>
+              <span id="audioEngineLabel" class="text-[#E56B45] font-semibold text-[9px]">LIVE WAVEFORM</span>
+              <span id="dockTotalDuration">0:30</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====================================================================
+             8a. MANIPULASI LANGSUNG (DRAG-AND-DROP QUEUE LIST)
+             ==================================================================== -->
+        <div data-imk-target="direct-drag" class="flex-1 flex flex-col min-h-0 relative">
+          <!-- Badge IMK Inspector -->
+          <div class="imk-inspect-badge absolute -top-5 left-0 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(8, 'Manipulasi Langsung (Direct Manipulation: Drag-and-Drop)')">
+            <i data-lucide="tag" class="w-3 h-3"></i> [IMK-8a] Drag & Drop Queue
+          </div>
+
+          <div class="flex items-center justify-between text-xs mb-2">
+            <span class="font-bold text-gray-300">Antrean Lagu (Queue)</span>
+            <span class="text-[10px] text-orange-300 font-mono">Tarik untuk Menggeser</span>
+          </div>
+
+          <ul id="draggableQueueList" class="flex-1 overflow-y-auto space-y-1.5 pr-1 text-xs">
+            <!-- Diisi JavaScript -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Quick Actions Footer in Right Dock -->
+      <div class="pt-3 border-t border-white/5 flex items-center justify-between text-xs">
+        <button onclick="toggleFloatingLyrics()" class="text-gray-400 hover:text-[#E56B45] flex items-center gap-1.5 transition">
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+          <span>Lirik Lagu</span>
+        </button>
+        <button onclick="clearQueue()" class="text-gray-500 hover:text-red-400 text-[11px] transition">
+          Bersihkan
+        </button>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ====================================================================
+       QUICK TERMINAL MODAL (Ctrl+K atau Tombol Header Terminal)
+       ==================================================================== -->
+  <div id="quickCliModal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#18181C] border border-white/10 rounded-3xl max-w-lg w-full p-5 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-white/5 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
+          <h3 class="font-bold text-xs font-mono text-white ml-2">Quick CLI Terminal (Ctrl+K)</h3>
+        </div>
+        <button onclick="closeQuickCliModal()" class="text-gray-400 hover:text-white transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Screen -->
+      <div id="modalCliScreen" class="bg-black/70 text-orange-200 font-mono text-xs p-3.5 rounded-2xl overflow-y-auto space-y-1 border border-white/5 h-56 mb-3">
+        <div class="text-gray-500">=== Quick Command Line Interface ===</div>
+        <div class="text-gray-500">Ketik '<span class="text-[#E56B45] font-bold">HELP</span>', 'PLAY "505"', 'PAUSE', atau 'VOLUME 70'.</div>
+      </div>
+
+      <!-- Quick Chips -->
+      <div class="flex items-center gap-1.5 mb-3 overflow-x-auto no-scrollbar py-0.5">
+        <span class="text-[10px] text-gray-500 font-mono">Perintah:</span>
+        <button onclick="runModalCli('HELP')" class="text-[10px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/5">HELP</button>
+        <button onclick="runModalCli('PLAY \"Arabella\"')" class="text-[10px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/5">PLAY "Arabella"</button>
+        <button onclick="runModalCli('PLAY \"505\"')" class="text-[10px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/5">PLAY "505"</button>
+        <button onclick="runModalCli('PAUSE')" class="text-[10px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/5">PAUSE</button>
+        <button onclick="runModalCli('VOLUME 80')" class="text-[10px] font-mono bg-white/5 hover:bg-white/10 text-gray-300 px-2 py-0.5 rounded-full border border-white/5">VOLUME 80</button>
+      </div>
+
+      <!-- Input -->
+      <div class="flex items-center gap-2 bg-black/50 rounded-2xl px-3 py-2 border border-white/10">
+        <span class="text-[#E56B45] font-mono text-xs font-bold">&gt;</span>
+        <input 
+          id="modalCliInput" 
+          type="text" 
+          placeholder='Ketik perintah CLI (tekan Enter untuk Run)...'
+          class="flex-1 bg-transparent font-mono text-xs text-white outline-none"
+          onkeydown="if(event.key === 'Enter'){ event.preventDefault(); submitModalCli(); }"
+        >
+        <button onclick="submitModalCli()" class="bg-[#E56B45] hover:bg-[#F27A54] text-white font-bold text-xs px-3.5 py-1.5 rounded-xl font-mono transition">
+          KIRIM
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       FLOATING DRAGGABLE LYRICS WINDOW (7b. SISTEM PENJENDELAAN)
+       ==================================================================== -->
+  <div 
+    id="floatingLyricsWindow" 
+    data-imk-target="window-floating" 
+    class="fixed hidden top-20 right-84 w-80 bg-[#18181C] rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden"
+  >
+    <!-- Badge IMK Inspector -->
+    <div class="imk-inspect-badge absolute -top-5 left-2 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(7, 'Sistem Penjendelaan: Floating Draggable Window')">
+      <i data-lucide="tag" class="w-3 h-3"></i> [IMK-7b] Floating Lyrics Window
+    </div>
+
+    <!-- Draggable Header Handle -->
+    <div id="floatingHeaderHandle" class="bg-gradient-to-r from-[#E56B45] to-[#FF8A65] text-white px-3.5 py-2 flex items-center justify-between cursor-move select-none shadow">
+      <div class="flex items-center gap-2 font-bold text-xs">
+        <i data-lucide="move" class="w-3.5 h-3.5"></i>
+        <span>Floating Lyrics Window</span>
+      </div>
+      <button onclick="toggleFloatingLyrics()" class="text-white hover:text-black p-0.5 rounded transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <div class="p-4 max-h-72 overflow-y-auto">
+      <div class="mb-2 pb-2 border-b border-white/5">
+        <h4 id="floatingSongTitle" class="font-bold text-xs text-white">Do I Wanna Know?</h4>
+        <p id="floatingSongArtist" class="text-[11px] text-gray-400">Arctic Monkeys</p>
+      </div>
+      <pre id="floatingLyricsContent" class="text-xs text-gray-300 font-sans whitespace-pre-line leading-relaxed italic">
+        Lirik lagu Arctic Monkeys akan muncul di sini...
+      </pre>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 5: CREATE PLAYLIST MODAL (FORM FILLING DIALOGUE)
+       ==================================================================== -->
+  <div id="playlistModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div data-imk-target="form-filling" class="bg-[#18181C] border border-white/10 rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+      <!-- Badge IMK Inspector -->
+      <div class="imk-inspect-badge absolute -top-5 left-4 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(5, 'Dialog Berbasis Pengisian Formulir (Form Filling Dialogue)')">
+        <i data-lucide="tag" class="w-3 h-3"></i> [IMK-5] Form Filling Dialogue
+      </div>
+
+      <div class="flex items-center justify-between pb-3 border-b border-white/5 mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-xl bg-[#E56B45]/20 text-[#E56B45] flex items-center justify-center">
+            <i data-lucide="folder-plus" class="w-4 h-4"></i>
+          </div>
+          <h3 class="font-bold text-sm text-white">Create New Playlist</h3>
+        </div>
+        <button onclick="closeCreatePlaylistModal()" class="text-gray-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handlePlaylistSubmit(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-gray-300 mb-1">Nama Playlist <span class="text-[#E56B45]">*</span></label>
+          <input id="formPlaylistName" type="text" placeholder="Contoh: Midnight Indie Session" class="w-full bg-[#121215] text-white px-3 py-2 rounded-xl border border-white/10 focus:border-[#E56B45] outline-none">
+          <p id="errPlaylistName" class="text-red-400 text-[10px] mt-1 hidden"></p>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-300 mb-1">Deskripsi</label>
+          <textarea id="formPlaylistDesc" rows="2" placeholder="Catatan singkat tentang playlist ini..." class="w-full bg-[#121215] text-white px-3 py-2 rounded-xl border border-white/10 focus:border-[#E56B45] outline-none resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-gray-300 mb-1">Genre <span class="text-[#E56B45]">*</span></label>
+            <select id="formPlaylistGenre" class="w-full bg-[#121215] text-white px-3 py-2 rounded-xl border border-white/10 focus:border-[#E56B45] outline-none">
+              <option value="">Pilih Genre</option>
+              <option value="Indie Rock">Indie Rock</option>
+              <option value="Alternative Rock">Alternative Rock</option>
+              <option value="Post-Punk">Post-Punk</option>
+              <option value="Garage Rock">Garage Rock</option>
+            </select>
+            <p id="errPlaylistGenre" class="text-red-400 text-[10px] mt-1 hidden"></p>
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-300 mb-1">Mood Target</label>
+            <select id="formPlaylistMood" class="w-full bg-[#121215] text-white px-3 py-2 rounded-xl border border-white/10 focus:border-[#E56B45] outline-none">
+              <option value="Chill">Chill</option>
+              <option value="Energetic">Energetic</option>
+              <option value="Sad">Sad</option>
+              <option value="Happy">Happy</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-300 mb-1">Privasi</label>
+          <div class="flex items-center gap-4 bg-[#121215] p-2 rounded-xl border border-white/10">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="playlistVisibility" value="Public" checked class="accent-[#E56B45]">
+              <span>Public</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="playlistVisibility" value="Private" class="accent-[#E56B45]">
+              <span>Private</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" class="w-full bg-[#E56B45] hover:bg-[#F27A54] text-white font-bold py-2.5 rounded-full transition shadow">
+            Simpan Playlist ke Server Flask
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       BOTTOM PLAYER BAR (PLAYCLOUD STYLE)
+       6. Antarmuka Berbasis Ikon (Icon-Based Interface)
+       8. Manipulasi Langsung (Interactive Sliders)
+       ==================================================================== -->
+  <footer data-imk-target="player-bar" class="h-20 bg-[#121215] border-t border-white/5 px-6 flex items-center justify-between gap-4 shrink-0 z-40 relative">
+    
+    <!-- Badge IMK Inspector -->
+    <div class="imk-inspect-badge absolute -top-5 left-6 items-center gap-1 bg-[#E56B45] text-white font-extrabold text-[10px] px-2 py-0.2 rounded shadow cursor-pointer hover:bg-white hover:text-black transition" onclick="showImkTheory(6, 'Antarmuka Berbasis Ikon (Icon-Based Interface)')">
+      <i data-lucide="tag" class="w-3 h-3"></i> [IMK-6] Icon-Based Interface & [IMK-8b] Sliders
+    </div>
+
+    <!-- SISI KIRI: TRACK INFO -->
+    <div class="w-1/4 min-w-[200px] flex items-center gap-3">
+      <div id="playerThumbContainer" class="w-12 h-12 rounded-xl overflow-hidden shrink-0 shadow bg-zinc-900">
+        <!-- Vektor cover kecil -->
+      </div>
+      <div class="min-w-0 flex-1">
+        <h4 id="playerCurrentTitle" class="font-bold text-xs text-white truncate hover:underline cursor-pointer">
+          Memuat lagu...
+        </h4>
+        <p id="playerCurrentArtist" class="text-[11px] text-gray-400 truncate">Arctic Monkeys</p>
+      </div>
+      <button onclick="toggleLikeCurrentSong()" class="p-1 text-gray-400 hover:text-[#E56B45] transition">
+        <i id="playerLikeIcon" data-lucide="heart" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- SISI TENGAH: KONTROL IKON & SCRUBBING SLIDER -->
+    <div class="flex-1 max-w-xl flex flex-col items-center">
+      
+      <!-- Tombol Kontrol Ikon Universal -->
+      <div class="flex items-center gap-5 mb-1">
+        <button id="btnShuffle" onclick="toggleShuffle()" title="Shuffle" class="text-gray-400 hover:text-white transition">
+          <i data-lucide="shuffle" class="w-4 h-4"></i>
+        </button>
+
+        <button onclick="playPrevTrack()" title="Previous Track" class="text-gray-300 hover:text-white transition">
+          <i data-lucide="skip-back" class="w-4 h-4 fill-current"></i>
+        </button>
+
+        <!-- Tombol Utama Play/Pause (Warm Terracotta Circle) -->
+        <button 
+          id="btnPlayPause" 
+          onclick="togglePlayPause()" 
+          title="Play / Pause"
+          class="w-10 h-10 rounded-full bg-[#E56B45] hover:bg-[#F27A54] hover:scale-105 active:scale-95 text-white flex items-center justify-center transition shadow-lg shadow-[#E56B45]/30"
+        >
+          <span id="playPauseIconContainer">
+            <svg class="w-5 h-5 fill-white ml-0.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </span>
+        </button>
+
+        <button onclick="playNextTrack()" title="Next Track" class="text-gray-300 hover:text-white transition">
+          <i data-lucide="skip-forward" class="w-4 h-4 fill-current"></i>
+        </button>
+
+        <button id="btnRepeat" onclick="toggleRepeat()" title="Repeat" class="text-gray-400 hover:text-white transition">
+          <i data-lucide="repeat" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- 8b. Slider Manipulasi Langsung: Progress Bar -->
+      <div class="w-full flex items-center gap-2.5 text-[11px] font-mono text-gray-400">
+        <span id="playerCurrentTime" class="w-8 text-right">0:00</span>
+        <input 
+          id="playerProgressSlider" 
+          type="range" 
+          min="0" 
+          max="30" 
+          value="0" 
+          step="0.1"
+          class="flex-1 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+          oninput="handleSeekProgress(this.value)"
+        >
+        <span id="playerTotalDuration" class="w-8">0:30</span>
+      </div>
+    </div>
+
+    <!-- SISI KANAN: VOLUME & WINDOW TOGGLES -->
+    <div class="w-1/4 min-w-[200px] flex items-center justify-end gap-3 text-gray-400">
+      <button onclick="toggleFloatingLyrics()" title="Jendela Lirik (Windowing)" class="hover:text-white transition p-1">
+        <i data-lucide="file-text" class="w-4 h-4"></i>
+      </button>
+
+      <button onclick="toggleSideDock()" title="Buka/Tutup Right Dock" class="hover:text-white transition p-1">
+        <i data-lucide="sidebar" class="w-4 h-4"></i>
+      </button>
+
+      <!-- Volume Slider Manipulasi Langsung -->
+      <div class="flex items-center gap-2">
+        <button onclick="toggleMuteVolume()" title="Mute / Unmute">
+          <i id="volumeIcon" data-lucide="volume-2" class="w-4 h-4 hover:text-white transition"></i>
+        </button>
+        <input 
+          id="playerVolumeSlider" 
+          type="range" 
+          min="0" 
+          max="100" 
+          value="80" 
+          class="w-20 md:w-24 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+          oninput="handleVolumeChange(this.value)"
+        >
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- ====================================================================
+       MODAL PENJELASAN TEORI IMK
+       ==================================================================== -->
+  <div id="imkTheoryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#18181C] border border-white/10 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-white/5 mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-[#E56B45] text-white font-bold flex items-center justify-center text-xs">
+            IMK
+          </div>
+          <h3 id="imkModalTitle" class="font-bold text-base text-white">Teori Ragam Dialog</h3>
+        </div>
+        <button onclick="closeImkTheoryModal()" class="text-gray-400 hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="imkModalBody" class="text-xs text-gray-300 space-y-3 leading-relaxed">
+        <!-- Diisi dinamis -->
+      </div>
+
+      <div class="mt-6 pt-3 border-t border-white/5 flex justify-end">
+        <button onclick="closeImkTheoryModal()" class="bg-[#E56B45] text-white font-bold text-xs px-5 py-2 rounded-full hover:bg-[#F27A54] transition">
+          Tutup Penjelasan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTEXT MENU (PULLDOWN) -->
+  <div id="songContextMenu" class="hidden fixed bg-[#18181C] border border-white/10 rounded-2xl shadow-2xl py-1.5 z-50 text-xs w-52">
+    <!-- Diisi JavaScript -->
+  </div>
+
+  <!-- ====================================================================
+       JAVASCRIPT LOGIC REAL AUDIO, SVG COVERS, & 9 IMK DIALOGUES
+       ==================================================================== -->
+  <script>
+    // State Global
+    let SONGS = [];
+    let QUEUE = [];
+    let CURRENT_SONG = null;
+    let IS_PLAYING = false;
+    let SHUFFLE = false;
+    let REPEAT = false;
+    let LIKED_IDS = new Set([1, 9]); // 505 & Do I Wanna Know default liked
+    let ACTIVE_VIEW = 'home';
+    let IS_INSPECTOR_MODE = false;
+
+    // Real HTML5 Audio Element
+    const audioElement = document.getElementById('realAudio');
+
+    // Web Audio API & Synth Ambient Fallback Engine
+    let audioCtx = null;
+    let analyser = null;
+    let dataArray = null;
+    let isWebAudioConnected = false;
+    let isSynthRunning = false;
+    let synthInterval = null;
+    let synthCurrentTime = 0;
+    let synthDuration = 30;
+    let synthOscs = [];
+    let synthGain = null;
+
+    // ==========================================================================
+    // GENERATOR VEKTOR SVG ALBUM ART LOKAL (100% Muncul Tanpa Blokir Jaringan)
+    // ==========================================================================
+    function getAlbumSvgHtml(song) {
+      if (!song) song = { id: 1, title: 'Arctic Monkeys', theme: 'am_wave', accent: '#E56B45' };
+
+      const theme = song.theme || 'am_wave';
+
+      if (theme === 'am_wave') {
+        // Minimalist Oscilloscope Frequency Wave khas album AM
+        return `
+          <svg class="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="#0D0D11"/>
+            <path d="M 15 100 Q 35 100 45 98 T 65 85 T 85 55 T 100 145 T 115 55 T 135 85 T 155 98 T 185 100" fill="none" stroke="#E56B45" stroke-width="3" stroke-linecap="round"/>
+            <path d="M 15 100 Q 35 100 45 98 T 65 90 T 85 70 T 100 130 T 115 70 T 135 90 T 155 98 T 185 100" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"/>
+            <text x="100" y="32" fill="#E56B45" font-size="11" font-weight="900" font-family="monospace" letter-spacing="3" text-anchor="middle">AM</text>
+            <text x="100" y="178" fill="rgba(255,255,255,0.5)" font-size="9" font-family="sans-serif" text-anchor="middle" font-weight="600">${song.title}</text>
+          </svg>
+        `;
+      } else if (theme === 'fwn_neon') {
+        // Geometric Skyline / House Grid khas Favourite Worst Nightmare (505)
+        return `
+          <svg class="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gradFwn" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#220B0F"/>
+                <stop offset="100%" stop-color="#0E0507"/>
+              </linearGradient>
+            </defs>
+            <rect width="200" height="200" fill="url(#gradFwn)"/>
+            <line x1="40" y1="140" x2="40" y2="80" stroke="#EF4444" stroke-width="2"/>
+            <line x1="40" y1="80" x2="100" y2="50" stroke="#EF4444" stroke-width="2"/>
+            <line x1="100" y1="50" x2="160" y2="80" stroke="#EF4444" stroke-width="2"/>
+            <line x1="160" y1="80" x2="160" y2="140" stroke="#EF4444" stroke-width="2"/>
+            <line x1="40" y1="140" x2="160" y2="140" stroke="#EF4444" stroke-width="2"/>
+            <rect x="75" y="85" width="20" height="25" fill="#EF4444" opacity="0.8"/>
+            <rect x="105" y="85" width="20" height="25" fill="#EF4444" opacity="0.8"/>
+            <text x="100" y="132" fill="#FFFFFF" font-size="14" font-weight="900" font-family="monospace" letter-spacing="4" text-anchor="middle">505</text>
+            <text x="100" y="178" fill="rgba(255,255,255,0.4)" font-size="8" font-family="sans-serif" text-anchor="middle">FWN (2007)</text>
+          </svg>
+        `;
+      } else if (theme === 'humbug_dark') {
+        // Dark Mysterious Lightning khas Humbug (Crying Lightning)
+        return `
+          <svg class="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gradHb" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#1A122A"/>
+                <stop offset="100%" stop-color="#0A0612"/>
+              </linearGradient>
+            </defs>
+            <rect width="200" height="200" fill="url(#gradHb)"/>
+            <polygon points="105,40 85,95 110,95 95,150 125,85 102,85" fill="#8B5CF6"/>
+            <circle cx="100" cy="95" r="45" fill="none" stroke="rgba(139, 92, 246, 0.3)" stroke-width="1.5" stroke-dasharray="3,3"/>
+            <text x="100" y="176" fill="#C4B5FD" font-size="9" font-weight="700" font-family="sans-serif" text-anchor="middle">HUMBUG</text>
+          </svg>
+        `;
+      } else {
+        // Retro Vintage Typography khas Whatever People Say I Am (Mardy Bum)
+        return `
+          <svg class="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="#1C1814"/>
+            <circle cx="100" cy="90" r="40" fill="none" stroke="#F59E0B" stroke-width="2"/>
+            <path d="M 90 90 Q 100 80 110 90" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+            <text x="100" y="75" fill="#F59E0B" font-size="8" font-family="sans-serif" text-anchor="middle" font-weight="800">ARCTIC MONKEYS</text>
+            <text x="100" y="145" fill="#FFFFFF" font-size="10" font-weight="900" font-family="sans-serif" text-anchor="middle" letter-spacing="1">MARDY BUM</text>
+            <text x="100" y="176" fill="rgba(255,255,255,0.4)" font-size="8" font-family="sans-serif" text-anchor="middle">2006 DEBUT</text>
+          </svg>
+        `;
+      }
+    }
+
+    // 1. Inisialisasi Aplikasi
+    document.addEventListener('DOMContentLoaded', async () => {
+      await fetchSongs();
+      await fetchPlaylists();
+      initRealAudioEvents();
+      initFloatingDrag();
+      initKeyboardShortcuts();
+      lucide.createIcons();
+      drawWaveformLoop();
+    });
+
+    async function fetchSongs() {
+      try {
+        const res = await fetch('/api/songs');
+        const text = await res.text();
+        const data = JSON.parse(text);
+
+        if (data.songs && data.songs.length > 0) {
+          SONGS = data.songs;
+          QUEUE = SONGS.map(s => s.id);
+          CURRENT_SONG = SONGS[0];
+
+          renderAlbumCards();
+          renderTracksTable();
+          renderAlbumsView();
+          renderQueueList();
+          renderBpmBarChart();
+          renderRadarChart(CURRENT_SONG);
+          updatePlayerUI(CURRENT_SONG);
+        }
+      } catch (e) {
+        console.error("Gagal mengambil data lagu:", e);
+      }
+    }
+
+    // 2. Real Audio Event Binding
+    function initRealAudioEvents() {
+      audioElement.volume = 0.8;
+
+      audioElement.addEventListener('play', () => {
+        IS_PLAYING = true;
+        stopAmbientSynth();
+        updatePlayPauseIcons();
+      });
+
+      audioElement.addEventListener('pause', () => {
+        IS_PLAYING = false;
+        updatePlayPauseIcons();
+      });
+
+      audioElement.addEventListener('timeupdate', () => {
+        if (!audioElement.duration) return;
+        const cur = audioElement.currentTime;
+        const dur = audioElement.duration;
+
+        document.getElementById('playerCurrentTime').textContent = formatSec(cur);
+        document.getElementById('dockCurrentTime').textContent = formatSec(cur);
+
+        document.getElementById('playerTotalDuration').textContent = formatSec(dur);
+        document.getElementById('dockTotalDuration').textContent = formatSec(dur);
+
+        const slider = document.getElementById('playerProgressSlider');
+        slider.max = dur;
+        slider.value = cur;
+      });
+
+      audioElement.addEventListener('ended', () => {
+        if (REPEAT) {
+          audioElement.currentTime = 0;
+          audioElement.play();
+        } else {
+          playNextTrack();
+        }
+      });
+
+      // Error handler audio preview / offline: otomatis switch ke Ambient Synth Fallback
+      audioElement.addEventListener('error', (e) => {
+        console.warn("Audio stream error / offline network. Beralih ke Ambient Synth Engine Fallback:", e);
+        if (IS_PLAYING && CURRENT_SONG) {
+          startAmbientSynth(CURRENT_SONG);
+        }
+      });
+    }
+
+    // Sambungkan Web Audio API
+    function ensureAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function connectWebAudio() {
+      ensureAudioContext();
+      if (isWebAudioConnected) return;
+      try {
+        const source = audioCtx.createMediaElementSource(audioElement);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        isWebAudioConnected = true;
+      } catch (err) {
+        // Fallback jika dibatasi CORS audio: visualizer tetap aktif
+        isWebAudioConnected = false;
+      }
+    }
+
+    // ==========================================================================
+    // AMBIENT SYNTHESIZER FALLBACK (Menjamin suara selalu ada meski offline)
+    // ==========================================================================
+    function startAmbientSynth(song) {
+      ensureAudioContext();
+      stopAmbientSynth();
+
+      isSynthRunning = true;
+      IS_PLAYING = true;
+      synthCurrentTime = 0;
+      synthDuration = song ? (song.duration > 30 ? 30 : song.duration) : 30;
+
+      // Buat synth chords generator yang hangat & lembut
+      synthGain = audioCtx.createGain();
+      const currentVol = (document.getElementById('playerVolumeSlider').value || 80) / 100;
+      synthGain.gain.setValueAtTime(currentVol * 0.25, audioCtx.currentTime);
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(800, audioCtx.currentTime);
+
+      // Frekuensi nada Dm - F - C - G khas Arctic Monkeys
+      const chordPitches = [
+        [146.83, 220.00, 261.63, 349.23], // Dm7
+        [174.61, 220.00, 261.63, 349.23], // Fmaj7
+        [130.81, 196.00, 261.63, 329.63], // Cmaj7
+        [196.00, 246.94, 293.66, 392.00]  // G
+      ];
+      const selectedChord = chordPitches[song ? (song.id % chordPitches.length) : 0];
+
+      synthOscs = selectedChord.map((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.connect(filter);
+        osc.start();
+        return osc;
+      });
+
+      filter.connect(synthGain);
+      synthGain.connect(analyser);
+      synthGain.connect(audioCtx.destination);
+
+      document.getElementById('audioEngineLabel').textContent = "SYNTH AMBIENT (FALLBACK)";
+
+      updatePlayPauseIcons();
+
+      // Progress ticker
+      if (synthInterval) clearInterval(synthInterval);
+      synthInterval = setInterval(() => {
+        if (!isSynthRunning) return;
+        synthCurrentTime += 0.5;
+        if (synthCurrentTime >= synthDuration) {
+          if (REPEAT) {
+            synthCurrentTime = 0;
+          } else {
+            playNextTrack();
+            return;
+          }
+        }
+        document.getElementById('playerCurrentTime').textContent = formatSec(synthCurrentTime);
+        document.getElementById('dockCurrentTime').textContent = formatSec(synthCurrentTime);
+        document.getElementById('playerTotalDuration').textContent = formatSec(synthDuration);
+        document.getElementById('dockTotalDuration').textContent = formatSec(synthDuration);
+
+        const slider = document.getElementById('playerProgressSlider');
+        slider.max = synthDuration;
+        slider.value = synthCurrentTime;
+      }, 500);
+    }
+
+    function stopAmbientSynth() {
+      isSynthRunning = false;
+      if (synthInterval) {
+        clearInterval(synthInterval);
+        synthInterval = null;
+      }
+      if (synthOscs.length > 0) {
+        synthOscs.forEach(o => {
+          try { o.stop(); o.disconnect(); } catch (e) {}
+        });
+        synthOscs = [];
+      }
+      if (synthGain) {
+        try { synthGain.disconnect(); } catch (e) {}
+        synthGain = null;
+      }
+    }
+
+    // 3. Playback Controls
+    function playTrackById(id) {
+      const song = SONGS.find(s => s.id === parseInt(id));
+      if (!song) return;
+
+      CURRENT_SONG = song;
+      ensureAudioContext();
+
+      // Reset synth jika sedang berjalan
+      stopAmbientSynth();
+
+      // Set audio source
+      audioElement.src = song.audio_url;
+      connectWebAudio();
+
+      const playPromise = audioElement.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          IS_PLAYING = true;
+          document.getElementById('audioEngineLabel').textContent = "LIVE WAVEFORM";
+          updatePlayPauseIcons();
+        }).catch(err => {
+          console.warn("Audio element play gagal/offline. Mengaktifkan synth fallback:", err);
+          startAmbientSynth(song);
+        });
+      }
+
+      // Update antrean
+      if (!QUEUE.includes(song.id)) {
+        QUEUE.unshift(song.id);
+      }
+
+      updatePlayerUI(song);
+      renderQueueList();
+      renderRadarChart(song);
+    }
+
+    function togglePlayPause() {
+      if (!CURRENT_SONG && SONGS.length > 0) {
+        playTrackById(SONGS[0].id);
+        return;
+      }
+
+      ensureAudioContext();
+
+      if (isSynthRunning) {
+        stopAmbientSynth();
+        IS_PLAYING = false;
+        updatePlayPauseIcons();
+        return;
+      }
+
+      if (audioElement.paused) {
+        connectWebAudio();
+        const p = audioElement.play();
+        if (p !== undefined) {
+          p.then(() => {
+            IS_PLAYING = true;
+            updatePlayPauseIcons();
+          }).catch(e => {
+            console.warn("Play error, start synth fallback:", e);
+            startAmbientSynth(CURRENT_SONG);
+          });
+        }
+      } else {
+        audioElement.pause();
+        IS_PLAYING = false;
+        updatePlayPauseIcons();
+      }
+    }
+
+    function playNextTrack() {
+      if (!QUEUE.length) return;
+      let idx = QUEUE.indexOf(CURRENT_SONG ? CURRENT_SONG.id : -1);
+      let nextIdx = SHUFFLE 
+        ? Math.floor(Math.random() * QUEUE.length) 
+        : (idx + 1) % QUEUE.length;
+
+      playTrackById(QUEUE[nextIdx]);
+    }
+
+    function playPrevTrack() {
+      if (!QUEUE.length) return;
+      let idx = QUEUE.indexOf(CURRENT_SONG ? CURRENT_SONG.id : -1);
+      let prevIdx = (idx - 1 + QUEUE.length) % QUEUE.length;
+      playTrackById(QUEUE[prevIdx]);
+    }
+
+    function handleSeekProgress(val) {
+      const targetSec = parseFloat(val);
+      if (isSynthRunning) {
+        synthCurrentTime = targetSec;
+        document.getElementById('playerCurrentTime').textContent = formatSec(synthCurrentTime);
+        document.getElementById('dockCurrentTime').textContent = formatSec(synthCurrentTime);
+      } else if (audioElement.duration) {
+        audioElement.currentTime = targetSec;
+      }
+    }
+
+    function handleVolumeChange(val) {
+      const v = parseInt(val) / 100;
+      audioElement.volume = Math.max(0, Math.min(1, v));
+      if (synthGain && audioCtx) {
+        synthGain.gain.setValueAtTime(v * 0.25, audioCtx.currentTime);
+      }
+      updateVolumeIcon(parseInt(val));
+    }
+
+    function toggleMuteVolume() {
+      if (audioElement.volume > 0) {
+        audioElement.dataset.prevVol = audioElement.volume;
+        audioElement.volume = 0;
+        document.getElementById('playerVolumeSlider').value = 0;
+        if (synthGain && audioCtx) synthGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        updateVolumeIcon(0);
+      } else {
+        const prev = parseFloat(audioElement.dataset.prevVol || 0.8);
+        audioElement.volume = prev;
+        document.getElementById('playerVolumeSlider').value = prev * 100;
+        if (synthGain && audioCtx) synthGain.gain.setValueAtTime(prev * 0.25, audioCtx.currentTime);
+        updateVolumeIcon(prev * 100);
+      }
+    }
+
+    function updateVolumeIcon(val) {
+      const ico = document.getElementById('volumeIcon');
+      if (val === 0) {
+        ico.setAttribute('data-lucide', 'volume-x');
+      } else if (val < 45) {
+        ico.setAttribute('data-lucide', 'volume-1');
+      } else {
+        ico.setAttribute('data-lucide', 'volume-2');
+      }
+      lucide.createIcons();
+    }
+
+    function toggleShuffle() {
+      SHUFFLE = !SHUFFLE;
+      document.getElementById('btnShuffle').className = SHUFFLE ? 'text-[#E56B45]' : 'text-gray-400 hover:text-white';
+    }
+
+    function toggleRepeat() {
+      REPEAT = !REPEAT;
+      document.getElementById('btnRepeat').className = REPEAT ? 'text-[#E56B45]' : 'text-gray-400 hover:text-white';
+    }
+
+    function toggleLikeCurrentSong() {
+      if (!CURRENT_SONG) return;
+      if (LIKED_IDS.has(CURRENT_SONG.id)) {
+        LIKED_IDS.delete(CURRENT_SONG.id);
+      } else {
+        LIKED_IDS.add(CURRENT_SONG.id);
+      }
+      updatePlayerUI(CURRENT_SONG);
+    }
+
+    // 4. Update UI Elements
+    function updatePlayerUI(song) {
+      if (!song) return;
+
+      // Bottom bar
+      document.getElementById('playerCurrentTitle').textContent = song.title;
+      document.getElementById('playerCurrentArtist').textContent = `${song.artist} • ${song.album}`;
+      document.getElementById('playerThumbContainer').innerHTML = getAlbumSvgHtml(song);
+
+      // Dock
+      document.getElementById('dockTrackTitle').textContent = song.title;
+      document.getElementById('dockTrackAlbum').textContent = `${song.artist} • ${song.album} (${song.year})`;
+      document.getElementById('dockCoverContainer').innerHTML = getAlbumSvgHtml(song);
+
+      // Floating Lyrics
+      document.getElementById('floatingSongTitle').textContent = song.title;
+      document.getElementById('floatingSongArtist').textContent = `${song.artist} (${song.album})`;
+      document.getElementById('floatingLyricsContent').textContent = song.lyrics || 'Lirik tidak tersedia.';
+
+      // Like icon
+      const isLiked = LIKED_IDS.has(song.id);
+      const bLike = document.getElementById('playerLikeIcon');
+      const dLike = document.getElementById('dockLikeIcon');
+      if (isLiked) {
+        bLike.classList.add('fill-[#E56B45]', 'text-[#E56B45]');
+        dLike.classList.add('fill-[#E56B45]', 'text-[#E56B45]');
+      } else {
+        bLike.classList.remove('fill-[#E56B45]', 'text-[#E56B45]');
+        dLike.classList.remove('fill-[#E56B45]', 'text-[#E56B45]');
+      }
+
+      updatePlayPauseIcons();
+      lucide.createIcons();
+    }
+
+    function updatePlayPauseIcons() {
+      const container = document.getElementById('playPauseIconContainer');
+      if (IS_PLAYING) {
+        container.innerHTML = `<svg class="w-5 h-5 fill-white" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+      } else {
+        container.innerHTML = `<svg class="w-5 h-5 fill-white ml-0.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+      }
+    }
+
+    function formatSec(s) {
+      if (!s || isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    // ==========================================================================
+    // 5. INTERAKSI GRAFIS: REAL-TIME WAVEFORM AUDIO VISUALIZER
+    // ==========================================================================
+    let waveTick = 0;
+    function drawWaveformLoop() {
+      requestAnimationFrame(drawWaveformLoop);
+
+      const canvas = document.getElementById('waveformCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const barCount = 36;
+      const barWidth = 4;
+      const gap = (width - (barCount * barWidth)) / (barCount - 1);
+
+      let freqData = null;
+      if (analyser && dataArray) {
+        analyser.getByteFrequencyData(dataArray);
+        freqData = dataArray;
+      }
+
+      waveTick += 0.08;
+
+      for (let i = 0; i < barCount; i++) {
+        let barHeight;
+        if (IS_PLAYING) {
+          if (freqData && freqData.length > 0) {
+            const val = freqData[i % freqData.length];
+            barHeight = Math.max(4, (val / 255) * (height - 8));
+          } else {
+            const wave = Math.sin(waveTick + i * 0.35) * Math.cos(waveTick * 0.5 + i * 0.15);
+            barHeight = Math.max(4, Math.abs(wave) * (height - 10) + 4);
+          }
+        } else {
+          barHeight = 4;
+        }
+
+        const x = i * (barWidth + gap);
+        const y = (height - barHeight) / 2;
+
+        const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
+        grad.addColorStop(0, '#FF8A65');
+        grad.addColorStop(1, '#E56B45');
+
+        ctx.fillStyle = IS_PLAYING ? grad : 'rgba(255, 255, 255, 0.2)';
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barHeight, 2);
+        ctx.fill();
+      }
+    }
+
+    // ==========================================================================
+    // 6. RAGAM DIALOG 1: CLI TERMINAL (MODAL & IMK LAB) - AMAN DARI JSON ERROR
+    // ==========================================================================
+    function openQuickCliModal() {
+      document.getElementById('quickCliModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('modalCliInput').focus(), 50);
+    }
+
+    function closeQuickCliModal() {
+      document.getElementById('quickCliModal').classList.add('hidden');
+    }
+
+    async function sendCliCommand(cmd, screenId) {
+      if (!cmd || !cmd.trim()) return;
+      appendTerminalLine(screenId, `> ${cmd}`, 'text-white font-bold');
+
+      try {
+        const res = await fetch('/api/cli', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({cmd: cmd.trim()})
+        });
+
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (jsonErr) {
+          appendTerminalLine(screenId, `Respon server bukan JSON: ${text.slice(0, 100)}`, 'text-red-400');
+          return;
+        }
+
+        const color = (data.output && data.output.startsWith('ERROR')) ? 'text-red-400' : 'text-orange-300';
+        appendTerminalLine(screenId, data.output || 'Perintah selesai diproses.', color);
+
+        if (data.actions && Array.isArray(data.actions)) {
+          data.actions.forEach(executeAction);
+        }
+      } catch (err) {
+        appendTerminalLine(screenId, `Jaringan Error: ${err.message}`, 'text-red-400');
+      }
+    }
+
+    function submitModalCli() {
+      const input = document.getElementById('modalCliInput');
+      const cmd = input.value.trim();
+      input.value = '';
+      sendCliCommand(cmd, 'modalCliScreen');
+    }
+
+    function runModalCli(c) {
+      document.getElementById('modalCliInput').value = c;
+      submitModalCli();
+    }
+
+    function submitLabCli() {
+      const input = document.getElementById('labCliInput');
+      const cmd = input.value.trim();
+      input.value = '';
+      sendCliCommand(cmd, 'labCliScreen');
+    }
+
+    function runLabCli(c) {
+      document.getElementById('labCliInput').value = c;
+      submitLabCli();
+    }
+
+    function appendTerminalLine(screenId, text, cls = 'text-orange-200') {
+      const screen = document.getElementById(screenId);
+      if (!screen) return;
+      const d = document.createElement('div');
+      d.className = cls;
+      d.textContent = text;
+      screen.appendChild(d);
+      screen.scrollTop = screen.scrollHeight;
+    }
+
+    function clearTerminalScreen(screenId) {
+      const screen = document.getElementById(screenId);
+      if (screen) {
+        screen.innerHTML = `
+          <div class="text-gray-500">=== Playcloud CLI Terminal v2.5 ===</div>
+          <div class="text-gray-500">Layar dibersihkan. Ketik 'HELP' untuk panduan.</div>
+        `;
+      }
+    }
+
+    // ==========================================================================
+    // 7. RAGAM DIALOG 2: BATCH SCRIPT RUNNER
+    // ==========================================================================
+    async function executeBatchScript() {
+      const script = document.getElementById('batchScriptEditor').value;
+      const logBox = document.getElementById('batchLogOutput');
+      logBox.innerHTML = '<span class="text-orange-300">Mengeksekusi skrip ke backend Python /api/batch...</span>';
+
+      try {
+        const res = await fetch('/api/batch', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({script: script})
+        });
+
+        const text = await res.text();
+        const data = JSON.parse(text);
+
+        logBox.innerHTML = '';
+        if (data.logs) {
+          data.logs.forEach(l => {
+            const row = document.createElement('div');
+            row.className = l.includes('FAIL') ? 'text-red-400' : (l.includes('KOMENTAR') ? 'text-gray-500 italic' : 'text-orange-200');
+            row.textContent = l;
+            logBox.appendChild(row);
+          });
+        }
+
+        const sum = document.createElement('div');
+        sum.className = 'text-[#FF8A65] font-bold mt-1.5 pt-1 border-t border-white/5';
+        sum.textContent = `>>> ${data.summary || 'Selesai.'}`;
+        logBox.appendChild(sum);
+
+        if (data.actions && Array.isArray(data.actions)) {
+          data.actions.forEach(executeAction);
+        }
+      } catch (e) {
+        logBox.innerHTML = `<span class="text-red-400">Error: ${e.message}</span>`;
+      }
+    }
+
+    function loadScriptTemplate() {
+      document.getElementById('batchScriptEditor').value = 
+`# Batch Script Koleksi Arctic Monkeys
+SET_VOLUME 85
+SHUFFLE ON
+QUEUE "Do I Wanna Know?"
+QUEUE "R U Mine?"
+QUEUE "505"
+PLAY "Arabella"`;
+    }
+
+    // ==========================================================================
+    // 8. RAGAM DIALOG 3: NATURAL LANGUAGE (NLP)
+    // ==========================================================================
+    async function sendNlpQuery() {
+      const input = document.getElementById('nlpInput');
+      const q = input.value.trim();
+      if (!q) return;
+
+      try {
+        const res = await fetch('/api/nlp', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({text: q})
+        });
+
+        const text = await res.text();
+        const data = JSON.parse(text);
+
+        const bar = document.getElementById('nlpFeedbackBar');
+        const feedback = document.getElementById('nlpFeedbackText');
+        feedback.textContent = data.output;
+        bar.classList.remove('hidden');
+
+        if (data.actions && Array.isArray(data.actions)) {
+          data.actions.forEach(executeAction);
+        }
+      } catch (e) {
+        console.error("NLP error:", e);
+      }
+    }
+
+    function setNlpAndSend(queryStr) {
+      document.getElementById('nlpInput').value = queryStr;
+      sendNlpQuery();
+    }
+
+    // Dispatcher aksi dari backend
+    function executeAction(act) {
+      if (!act || !act.type) return;
+      switch (act.type) {
+        case 'play':
+          if (act.id) playTrackById(act.id);
+          break;
+        case 'resume':
+          togglePlayPause();
+          break;
+        case 'pause':
+          audioElement.pause();
+          stopAmbientSynth();
+          IS_PLAYING = false;
+          updatePlayPauseIcons();
+          break;
+        case 'next':
+          playNextTrack();
+          break;
+        case 'prev':
+          playPrevTrack();
+          break;
+        case 'queue':
+          if (act.id && !QUEUE.includes(parseInt(act.id))) {
+            QUEUE.push(parseInt(act.id));
+            renderQueueList();
+          }
+          break;
+        case 'volume':
+          handleVolumeChange(act.value);
+          document.getElementById('playerVolumeSlider').value = act.value;
+          break;
+        case 'volume_delta':
+          const curV = Math.round(audioElement.volume * 100);
+          const newV = Math.max(0, Math.min(100, curV + act.value));
+          handleVolumeChange(newV);
+          document.getElementById('playerVolumeSlider').value = newV;
+          break;
+        case 'shuffle':
+          SHUFFLE = !!act.value;
+          document.getElementById('btnShuffle').className = SHUFFLE ? 'text-[#E56B45]' : 'text-gray-400 hover:text-white';
+          break;
+        case 'repeat':
+          REPEAT = !!act.value;
+          document.getElementById('btnRepeat').className = REPEAT ? 'text-[#E56B45]' : 'text-gray-400 hover:text-white';
+          break;
+      }
+    }
+
+    // ==========================================================================
+    // 9. RAGAM DIALOG 4: FLAT MENU & PULLDOWN CONTEXT MENU
+    // ==========================================================================
+    function switchView(viewName) {
+      ACTIVE_VIEW = viewName;
+      const views = ['home', 'albums', 'tracks', 'lab'];
+      
+      views.forEach(v => {
+        const sec = document.getElementById(`view-${v}`);
+        const btn = document.getElementById(`nav-${v}`);
+        if (!sec || !btn) return;
+
+        if (v === viewName) {
+          sec.classList.remove('hidden');
+          // Highlight Marker Aktif (IMK 4a)
+          btn.className = "w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition text-white bg-[#E56B45]/15 border-l-4 border-[#E56B45] shadow-sm";
+        } else {
+          sec.classList.add('hidden');
+          btn.className = "w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition text-gray-400 hover:text-white hover:bg-white/5 border-l-4 border-transparent";
+        }
+      });
+      lucide.createIcons();
+    }
+
+    function toggleProfileMenu(e) {
+      e.stopPropagation();
+      document.getElementById('profileDropdown').classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', () => {
+      document.getElementById('profileDropdown').classList.add('hidden');
+      document.getElementById('songContextMenu').classList.add('hidden');
+    });
+
+    function openSongMenu(e, songId) {
+      e.stopPropagation();
+      const song = SONGS.find(s => s.id === parseInt(songId));
+      if (!song) return;
+
+      const menu = document.getElementById('songContextMenu');
+      menu.innerHTML = `
+        <div class="px-3 py-1.5 border-b border-white/5 text-[10px] text-gray-400 font-semibold truncate">
+          ${song.title}
+        </div>
+        <button onclick="playTrackById(${song.id})" class="w-full text-left px-3 py-2 hover:bg-white/5 hover:text-[#E56B45] flex items-center gap-2">
+          <i data-lucide="play" class="w-3.5 h-3.5"></i> Putar Lagu
+        </button>
+        <button onclick="executeAction({type:'queue', id:${song.id}})" class="w-full text-left px-3 py-2 hover:bg-white/5 hover:text-[#E56B45] flex items-center gap-2">
+          <i data-lucide="list-plus" class="w-3.5 h-3.5"></i> Masukkan Antrean
+        </button>
+        <button onclick="renderRadarChart(SONGS.find(s=>s.id===${song.id}))" class="w-full text-left px-3 py-2 hover:bg-white/5 hover:text-white flex items-center gap-2">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Analisis Radar
+        </button>
+        <button onclick="removeSongFromQueue(${song.id})" class="w-full text-left px-3 py-2 hover:bg-white/5 text-red-400 flex items-center gap-2">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus dari Antrean
+        </button>
+      `;
+
+      menu.style.left = `${Math.min(e.clientX, window.innerWidth - 220)}px`;
+      menu.style.top = `${Math.min(e.clientY, window.innerHeight - 200)}px`;
+      menu.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function removeSongFromQueue(id) {
+      QUEUE = QUEUE.filter(x => x !== parseInt(id));
+      renderQueueList();
+    }
+
+    // ==========================================================================
+    // 10. RAGAM DIALOG 5: FORM FILLING (PLAYLIST)
+    // ==========================================================================
+    function openCreatePlaylistModal() {
+      document.getElementById('playlistModal').classList.remove('hidden');
+    }
+    function closeCreatePlaylistModal() {
+      document.getElementById('playlistModal').classList.add('hidden');
+    }
+
+    async function handlePlaylistSubmit(e) {
+      e.preventDefault();
+      document.getElementById('errPlaylistName').classList.add('hidden');
+      document.getElementById('errPlaylistGenre').classList.add('hidden');
+
+      const name = document.getElementById('formPlaylistName').value;
+      const desc = document.getElementById('formPlaylistDesc').value;
+      const genre = document.getElementById('formPlaylistGenre').value;
+      const mood = document.getElementById('formPlaylistMood').value;
+      const vis = document.querySelector('input[name="playlistVisibility"]:checked').value;
+
+      try {
+        const res = await fetch('/api/playlist', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({name, description: desc, genre, mood, visibility: vis})
+        });
+
+        const text = await res.text();
+        const data = JSON.parse(text);
+
+        if (data.status === 'error' && data.errors) {
+          if (data.errors.name) {
+            const el = document.getElementById('errPlaylistName');
+            el.textContent = data.errors.name;
+            el.classList.remove('hidden');
+          }
+          if (data.errors.genre) {
+            const el = document.getElementById('errPlaylistGenre');
+            el.textContent = data.errors.genre;
+            el.classList.remove('hidden');
+          }
+          return;
+        }
+
+        closeCreatePlaylistModal();
+        await fetchPlaylists();
+      } catch (err) {
+        console.error("Gagal submit playlist:", err);
+      }
+    }
+
+    async function fetchPlaylists() {
+      try {
+        const res = await fetch('/api/playlist');
+        const text = await res.text();
+        const data = JSON.parse(text);
+        const container = document.getElementById('sidebarPlaylistsList');
+        container.innerHTML = '';
+
+        if (data.playlists) {
+          data.playlists.forEach(p => {
+            const row = document.createElement('div');
+            row.className = "px-2.5 py-1.5 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between text-xs text-gray-300 transition group";
+            row.innerHTML = `
+              <span class="truncate">${p.name}</span>
+              <span class="text-[9px] bg-white/5 group-hover:bg-[#E56B45]/20 group-hover:text-[#E56B45] px-1.5 py-0.5 rounded font-mono">${p.genre}</span>
+            `;
+            row.onclick = () => alert(`Playlist: ${p.name}\nGenre: ${p.genre}\nMood: ${p.mood}\nPrivasi: ${p.visibility}`);
+            container.appendChild(row);
+          });
+        }
+      } catch (e) {
+        console.error("Playlist error:", e);
+      }
+    }
+
+    // ==========================================================================
+    // 11. RAGAM DIALOG 7: WINDOWING SYSTEM
+    // ==========================================================================
+    function toggleSideDock() {
+      document.getElementById('rightDockPanel').classList.toggle('hidden');
+    }
+
+    function toggleFloatingLyrics() {
+      document.getElementById('floatingLyricsWindow').classList.toggle('hidden');
+    }
+
+    function initFloatingDrag() {
+      const handle = document.getElementById('floatingHeaderHandle');
+      const win = document.getElementById('floatingLyricsWindow');
+      let isDragging = false, ox, oy;
+
+      handle.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        ox = e.clientX - win.offsetLeft;
+        oy = e.clientY - win.offsetTop;
+      });
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        win.style.left = `${Math.max(10, e.clientX - ox)}px`;
+        win.style.top = `${Math.max(10, e.clientY - oy)}px`;
+      });
+      document.addEventListener('mouseup', () => isDragging = false);
+    }
+
+    // ==========================================================================
+    // 12. RAGAM DIALOG 8: DRAG & DROP QUEUE
+    // ==========================================================================
+    function renderQueueList() {
+      const ul = document.getElementById('draggableQueueList');
+      ul.innerHTML = '';
+
+      QUEUE.forEach((sid, idx) => {
+        const song = SONGS.find(s => s.id === sid);
+        if (!song) return;
+
+        const isCurrent = CURRENT_SONG && CURRENT_SONG.id === song.id;
+        const li = document.createElement('li');
+        li.draggable = true;
+        li.dataset.index = idx;
+        li.dataset.id = song.id;
+
+        li.className = `p-2 rounded-xl flex items-center justify-between gap-2 cursor-grab active:cursor-grabbing transition border ${
+          isCurrent 
+            ? 'bg-[#E56B45]/15 border-[#E56B45]/40 text-white' 
+            : 'bg-[#18181C] border-white/5 hover:bg-white/5 text-gray-300'
+        }`;
+
+        li.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0">
+            <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-gray-500 shrink-0"></i>
+            <div class="min-w-0">
+              <p class="font-bold text-xs truncate ${isCurrent ? 'text-[#E56B45]' : 'text-white'}">${song.title}</p>
+              <p class="text-[10px] text-gray-400 truncate">${song.album}</p>
+            </div>
+          </div>
+          <button onclick="playTrackById(${song.id})" class="text-gray-400 hover:text-white p-1">
+            <i data-lucide="play" class="w-3 h-3"></i>
+          </button>
+        `;
+
+        li.addEventListener('dragstart', handleDragStart);
+        li.addEventListener('dragover', handleDragOver);
+        li.addEventListener('drop', handleDrop);
+        li.addEventListener('dragend', handleDragEnd);
+
+        ul.appendChild(li);
+      });
+      lucide.createIcons();
+    }
+
+    let dragSource = null;
+    function handleDragStart(e) {
+      dragSource = parseInt(this.dataset.index);
+      e.dataTransfer.effectAllowed = 'move';
+      this.classList.add('opacity-40');
+    }
+    function handleDragOver(e) {
+      e.preventDefault();
+      this.classList.add('border-t-2', 'border-[#E56B45]');
+    }
+    function handleDrop(e) {
+      e.stopPropagation();
+      const target = parseInt(this.dataset.index);
+      if (dragSource !== null && dragSource !== target) {
+        const item = QUEUE.splice(dragSource, 1)[0];
+        QUEUE.splice(target, 0, item);
+        fetch('/api/queue/reorder', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({queue_ids: QUEUE})
+        });
+        renderQueueList();
+      }
+      this.classList.remove('border-t-2', 'border-[#E56B45]');
+    }
+    function handleDragEnd() {
+      this.classList.remove('opacity-40');
+      document.querySelectorAll('#draggableQueueList li').forEach(li => li.classList.remove('border-t-2', 'border-[#E56B45]'));
+    }
+    function clearQueue() {
+      QUEUE = CURRENT_SONG ? [CURRENT_SONG.id] : [];
+      renderQueueList();
+    }
+
+    // ==========================================================================
+    // 13. RAGAM DIALOG 9: ALBUM CARDS, CHARTS, & ALBUMS DISCOGRAPHY
+    // ==========================================================================
+    function renderAlbumCards() {
+      const grid = document.getElementById('albumGrid');
+      grid.innerHTML = '';
+
+      SONGS.forEach(s => {
+        const card = document.createElement('div');
+        card.className = "bg-[#18181C] hover:bg-[#202026] p-3 rounded-2xl transition duration-300 group cursor-pointer border border-white/5 hover:border-white/10 hover:-translate-y-1 shadow-lg relative flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <div class="w-full aspect-square rounded-xl overflow-hidden mb-2 relative shadow bg-zinc-900">
+              ${getAlbumSvgHtml(s)}
+              <button onclick="event.stopPropagation(); playTrackById(${s.id})" class="absolute bottom-2 right-2 w-9 h-9 rounded-full bg-[#E56B45] text-white flex items-center justify-center shadow-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition duration-300 hover:scale-110">
+                <i data-lucide="play" class="w-4 h-4 fill-white ml-0.5"></i>
+              </button>
+            </div>
+            <h4 class="font-bold text-xs text-white truncate">${s.title}</h4>
+            <p class="text-[10px] text-gray-400 truncate">${s.album}</p>
+          </div>
+          <div class="flex items-center justify-between text-[9px] text-gray-500 font-mono mt-2 pt-1 border-t border-white/5">
+            <span class="text-orange-300">${s.mood}</span>
+            <span>${s.tempo} BPM</span>
+          </div>
+        `;
+        card.onclick = () => playTrackById(s.id);
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function renderTracksTable() {
+      const tbody = document.getElementById('tracksTableBody');
+      tbody.innerHTML = '';
+
+      SONGS.forEach((s, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-white/5 transition group text-gray-300 cursor-pointer";
+        tr.innerHTML = `
+          <td class="py-3 px-4 text-center font-mono text-gray-500">${idx + 1}</td>
+          <td class="py-3 px-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-lg overflow-hidden shrink-0 shadow bg-zinc-900">
+                ${getAlbumSvgHtml(s)}
+              </div>
+              <div>
+                <div class="font-bold text-white text-xs">${s.title}</div>
+                <div class="text-[10px] text-gray-400">${s.artist}</div>
+              </div>
+            </div>
+          </td>
+          <td class="py-3 px-4 hidden md:table-cell text-gray-400 text-xs">${s.album}</td>
+          <td class="py-3 px-4 hidden sm:table-cell">
+            <span class="bg-[#E56B45]/15 text-orange-200 text-[10px] px-2 py-0.5 rounded-full border border-[#E56B45]/20 font-mono">${s.mood}</span>
+          </td>
+          <td class="py-3 px-4 text-center font-mono text-xs text-gray-400">${s.tempo}</td>
+          <td class="py-3 px-4 text-right font-mono text-xs text-gray-400">${formatSec(s.duration)}</td>
+          <td class="py-3 px-4 text-center">
+            <button onclick="openSongMenu(event, ${s.id})" class="text-gray-400 hover:text-white p-1">
+              <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+            </button>
+          </td>
+        `;
+        tr.onclick = (e) => {
+          if (!e.target.closest('button')) playTrackById(s.id);
+        };
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function renderAlbumsView() {
+      const container = document.getElementById('albumsViewContainer');
+      container.innerHTML = '';
+
+      // Kelompokkan 10 lagu berdasarkan 4 album resmi
+      const albumMap = {};
+      SONGS.forEach(s => {
+        if (!albumMap[s.album]) albumMap[s.album] = [];
+        albumMap[s.album].push(s);
+      });
+
+      Object.keys(albumMap).forEach(albumName => {
+        const tracks = albumMap[albumName];
+        const card = document.createElement('div');
+        card.className = "bg-[#18181C] p-5 rounded-3xl border border-white/5 shadow-xl flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-4">
+                <div class="w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-lg bg-zinc-900">
+                  ${getAlbumSvgHtml(tracks[0])}
+                </div>
+                <div>
+                  <span class="text-[10px] text-[#E56B45] font-bold uppercase tracking-wider">Official Album</span>
+                  <h3 class="text-lg font-bold text-white">${albumName}</h3>
+                  <p class="text-xs text-gray-400">${tracks[0].year} • ${tracks.length} Lagu Pilihan</p>
+                </div>
+              </div>
+              <button onclick="playAlbumTracks('${albumName}')" class="bg-[#E56B45] hover:bg-[#F27A54] text-white text-xs font-bold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow transition">
+                <i data-lucide="play" class="w-3.5 h-3.5 fill-white"></i>
+                <span>Putar Album</span>
+              </button>
+            </div>
+            <div class="space-y-1.5 border-t border-white/5 pt-3">
+              ${tracks.map(t => `
+                <div onclick="playTrackById(${t.id})" class="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 cursor-pointer text-xs group transition">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <i data-lucide="play" class="w-3.5 h-3.5 text-gray-500 group-hover:text-[#E56B45] shrink-0"></i>
+                    <span class="font-semibold text-white truncate">${t.title}</span>
+                  </div>
+                  <span class="text-[10px] text-gray-500 font-mono shrink-0">${formatSec(t.duration)}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function playAlbumTracks(albumName) {
+      const albumTracks = SONGS.filter(s => s.album === albumName);
+      if (albumTracks.length > 0) {
+        QUEUE = albumTracks.map(t => t.id);
+        playTrackById(albumTracks[0].id);
+      }
+    }
+
+    function renderBpmBarChart() {
+      const box = document.getElementById('bpmBarChart');
+      box.innerHTML = '';
+
+      const maxBpm = 140;
+      SONGS.forEach(s => {
+        const pct = Math.round((s.tempo / maxBpm) * 100);
+        const row = document.createElement('div');
+        row.className = "flex items-center gap-3 text-xs hover:bg-white/5 p-1 rounded-xl transition cursor-pointer";
+        row.onclick = () => playTrackById(s.id);
+        row.innerHTML = `
+          <div class="w-32 truncate text-gray-300 font-semibold">${s.title}</div>
+          <div class="flex-1 bg-black/40 h-2.5 rounded-full overflow-hidden border border-white/5">
+            <div class="bg-gradient-to-r from-orange-500 to-[#E56B45] h-full rounded-full" style="width: ${pct}%"></div>
+          </div>
+          <div class="w-16 text-right font-mono text-[10px] text-orange-300">${s.tempo} BPM</div>
+        `;
+        box.appendChild(row);
+      });
+    }
+
+    function renderRadarChart(song) {
+      if (!song) return;
+      document.getElementById('radarActiveSongLabel').textContent = song.title;
+      const svg = document.getElementById('radarSvg');
+      svg.innerHTML = '';
+
+      const cx = 110, cy = 100, radius = 70;
+      const attrs = [
+        {name: "Energy", val: song.energy || 50},
+        {name: "Dance", val: song.danceability || 50},
+        {name: "Valence", val: song.valence || 50},
+        {name: "Acoustic", val: song.acousticness || 50},
+        {name: "Tempo", val: Math.min(100, Math.round((song.tempo / 140) * 100))}
+      ];
+
+      const step = (Math.PI * 2) / attrs.length;
+
+      // Concentric guide circles
+      [0.25, 0.5, 0.75, 1.0].forEach(lvl => {
+        const pts = [];
+        for (let i = 0; i < attrs.length; i++) {
+          const a = i * step - Math.PI / 2;
+          pts.push(`${cx + radius * lvl * Math.cos(a)},${cy + radius * lvl * Math.sin(a)}`);
+        }
+        const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        poly.setAttribute("points", pts.join(' '));
+        poly.setAttribute("fill", "none");
+        poly.setAttribute("stroke", "rgba(255,255,255,0.08)");
+        svg.appendChild(poly);
+      });
+
+      // Labels & axes
+      attrs.forEach((attr, i) => {
+        const a = i * step - Math.PI / 2;
+        const x2 = cx + radius * Math.cos(a);
+        const y2 = cy + radius * Math.sin(a);
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", cx);
+        line.setAttribute("y1", cy);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", "rgba(255,255,255,0.08)");
+        svg.appendChild(line);
+
+        const lx = cx + (radius + 16) * Math.cos(a);
+        const ly = cy + (radius + 16) * Math.sin(a) + 3;
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", lx);
+        text.setAttribute("y", ly);
+        text.setAttribute("fill", "#888");
+        text.setAttribute("font-size", "8.5");
+        text.setAttribute("text-anchor", "middle");
+        text.textContent = attr.name;
+        svg.appendChild(text);
+      });
+
+      // Data polygon
+      const valPoints = attrs.map((attr, i) => {
+        const a = i * step - Math.PI / 2;
+        const r = radius * (attr.val / 100);
+        return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
+      });
+
+      const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      poly.setAttribute("points", valPoints.join(' '));
+      poly.setAttribute("fill", "rgba(229, 107, 69, 0.35)");
+      poly.setAttribute("stroke", "#E56B45");
+      poly.setAttribute("stroke-width", "2");
+      svg.appendChild(poly);
+    }
+
+    // ==========================================================================
+    // 14. IMK INSPECTOR & KEYBOARD SHORTCUTS
+    // ==========================================================================
+    function toggleImkInspector() {
+      IS_INSPECTOR_MODE = !IS_INSPECTOR_MODE;
+      const banner = document.getElementById('inspectorBanner');
+      const btn = document.getElementById('btnInspectorToggle');
+      const text = document.getElementById('inspectorBtnText');
+
+      if (IS_INSPECTOR_MODE) {
+        document.body.classList.add('imk-inspector-active');
+        banner.classList.remove('hidden');
+        text.textContent = "Inspector ON";
+        btn.classList.add('!bg-[#E56B45]', '!text-white');
+      } else {
+        document.body.classList.remove('imk-inspector-active');
+        banner.classList.add('hidden');
+        text.textContent = "IMK Inspector";
+        btn.classList.remove('!bg-[#E56B45]', '!text-white');
+      }
+    }
+
+    function initKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        // Ctrl+K -> Quick Terminal
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          openQuickCliModal();
+        }
+        // Escape -> Close modals
+        if (e.key === 'Escape') {
+          closeQuickCliModal();
+          closeCreatePlaylistModal();
+          closeImkTheoryModal();
+        }
+        // Spacebar -> Play/Pause jika tidak sedang mengetik
+        if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+          e.preventDefault();
+          togglePlayPause();
+        }
+      });
+    }
+
+    const IMK_THEORY_DATA = {
+      1: {
+        title: "1. Dialog Berbasis Perintah Tunggal (Command Line Dialogue)",
+        concept: "Interaksi langsung melalui baris perintah berformat teks tegas (kata kerja + argumen) yang diparsing oleh backend.",
+        advantages: "Ekspektasi tinggi bagi power-user, eksekusi perintah instan, dan hemat penggunaan memori/GUI.",
+        implementation: "Panel CLI Terminal di menu IMK Lab dan Quick Modal (Ctrl+K). Sintaks seperti `PLAY \"505\"`, `PAUSE`, `NEXT`, atau `VOLUME 80` diproses oleh endpoint Flask `/api/cli`."
+      },
+      2: {
+        title: "2. Dialog Berbasis Bahasa Pemrograman (Batch Script Dialogue)",
+        concept: "Eksekusi sekumpulan baris perintah sekaligus dalam satu berkas skrip secara berurutan tanpa jeda manual pengguna.",
+        advantages: "Otomatisasi alur kerja playlist yang rumit dalam sekali jalan (batch processing).",
+        implementation: "Playlist Batch Script Runner di tab IMK Lab. Diproses sekuensial oleh `/api/batch` layaknya interpreter."
+      },
+      3: {
+        title: "3. Antarmuka Berbasis Bahasa Alami (Natural Language Interface)",
+        concept: "Memungkinkan pengguna berkomunikasi menggunakan bahasa manusia bebas sehari-hari tanpa keharusan mengingat aturan sintaks.",
+        advantages: "User-friendly bagi pemula dan sangat intuitif.",
+        implementation: "Smart Assistant Bar di bilah atas. Memahami perintah santai seperti 'Putar lagu galau Arctic Monkeys' atau 'Kecilkan volumenya' via `/api/nlp`."
+      },
+      4: {
+        title: "4. Sistem Menu (Menu System: Flat & Pulldown)",
+        concept: "Menyediakan pilihan opsi visual yang jelas sehingga meringankan beban kognitif memori pengguna (Recognition over Recall).",
+        advantages: "Mencegah salah ketik dan memudahkan navigasi.",
+        implementation: "• Flat Menu: Sidebar kiri dengan highlight oranye terracotta.\n• Pulldown Menu: Dropdown `...` pada tiap lagu dan profil pengguna."
+      },
+      5: {
+        title: "5. Dialog Pengisian Formulir (Form Filling Dialogue)",
+        concept: "Pengisian data terstruktur dengan label, beragam jenis input, validasi otomatis, dan umpan balik kesalahan (error message).",
+        advantages: "Panduan bertahap dan rapi untuk data input banyak.",
+        implementation: "Modal formulir 'Create New Playlist' dengan input teks, dropdown genre/mood, dan radio button visibilitas via `/api/playlist`."
+      },
+      6: {
+        title: "6. Antarmuka Berbasis Ikon (Icon-Based Interface)",
+        concept: "Representasi piktogram universal untuk fungsi sistem audio.",
+        advantages: "Dapat dimengerti melintasi bahasa dan menghemat ruang antarmuka.",
+        implementation: "Bottom Player Bar dengan ikon universal Lucide: Play/Pause, Shuffle, Repeat, Skip, dan Volume."
+      },
+      7: {
+        title: "7. Sistem Penjendelaan (Windowing System)",
+        concept: "Membagi layar menjadi beberapa jendela/panel mandiri yang dapat dibuka, ditutup, atau digeser.",
+        advantages: "Mendukung multi-tasking dinamis.",
+        implementation: "• Right Dock (Now Playing & Waveform) yang bisa dibuka-tutup.\n• Floating Lyrics Window yang dapat digeser (draggable) dengan mouse."
+      },
+      8: {
+        title: "8. Manipulasi Langsung (Direct Manipulation)",
+        concept: "Pengguna berinteraksi langsung secara fisik dengan representasi objek grafis dengan umpan balik visual seketika.",
+        advantages: "Intuitif dan memberikan rasa kendali penuh.",
+        implementation: "• Drag-and-drop urutan lagu di daftar antrean Right Dock.\n• Interactive slider durasi musik dan volume suara secara real-time."
+      },
+      9: {
+        title: "9. Antarmuka Berbasis Interaksi Grafis (Graphical Interface)",
+        concept: "Penyajian data non-tekstual yang interaktif seperti animasi spektrum frekuensi audio dan diagram grafis.",
+        advantages: "Estetis dan mempermudah pemahaman data komparatif.",
+        implementation: "• Real-time Waveform Audio Visualizer di panel kanan.\n• Vector SVG Album Art minimalis 100% lokal.\n• Grafik batang tempo BPM dan radar chart karakteristik audio."
+      }
+    };
+
+    function showImkTheory(num, fallbackTitle) {
+      const data = IMK_THEORY_DATA[num];
+      if (!data) return;
+
+      document.getElementById('imkModalTitle').textContent = data.title;
+      document.getElementById('imkModalBody').innerHTML = `
+        <div class="bg-black/50 p-3 rounded-2xl border border-white/5">
+          <h5 class="font-bold text-[#E56B45] mb-1">📖 Konsep Teori IMK:</h5>
+          <p>${data.concept}</p>
+        </div>
+        <div>
+          <h5 class="font-bold text-[#E56B45] mb-1">💡 Kelebihan & Karakteristik:</h5>
+          <p>${data.advantages}</p>
+        </div>
+        <div class="bg-[#E56B45]/10 p-3 rounded-2xl border border-[#E56B45]/20">
+          <h5 class="font-bold text-orange-300 mb-1">🎯 Implementasi pada Aplikasi Ini:</h5>
+          <p class="whitespace-pre-line">${data.implementation}</p>
+        </div>
+      `;
+      document.getElementById('imkTheoryModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function showImkSummaryModal() {
+      document.getElementById('imkModalTitle').textContent = "Ringkasan 9 Ragam Dialog Interaktif (IMK)";
+      let html = `<div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">`;
+      for (let i = 1; i <= 9; i++) {
+        const item = IMK_THEORY_DATA[i];
+        html += `
+          <div class="p-2.5 bg-black/40 rounded-xl border border-white/5">
+            <h6 class="font-bold text-[#E56B45] text-xs">${item.title}</h6>
+            <p class="text-[11px] text-gray-300 mt-1">${item.concept}</p>
+          </div>
+        `;
+      }
+      html += `</div>`;
+      document.getElementById('imkModalBody').innerHTML = html;
+      document.getElementById('imkTheoryModal').classList.remove('hidden');
+    }
+
+    function closeImkTheoryModal() {
+      document.getElementById('imkTheoryModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
